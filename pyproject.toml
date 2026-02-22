@@ -32,6 +32,7 @@ dependencies = [
     "pydantic-settings>=2.0",
     "tenacity>=8.0",
     "platformdirs>=4.0",
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]
