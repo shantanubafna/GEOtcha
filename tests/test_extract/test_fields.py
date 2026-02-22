@@ -1,0 +1,204 @@
+"""Tests for field extraction utilities."""
+
+from geotcha.extract.fields import (
+    detect_responder_status,
+    detect_sample_acquisition,
+    detect_tissue,
+    detect_treatment,
+    extract_age_from_characteristics,
+    extract_disease_from_characteristics,
+    extract_gender_from_characteristics,
+    extract_responder_from_characteristics,
+    extract_timepoint,
+    extract_timepoint_from_characteristics,
+    extract_treatment_from_characteristics,
+    parse_characteristics,
+)
+
+
+class TestDetectResponderStatus:
+    def test_responder(self):
+        assert detect_responder_status("patient is a responder") == "responder"
+
+    def test_non_responder(self):
+        assert detect_responder_status("non-responder to treatment") == "non-responder"
+
+    def test_partial_responder(self):
+        assert detect_responder_status("partial responder") == "partial responder"
+
+    def test_no_status(self):
+        assert detect_responder_status("normal healthy control") is None
+
+    def test_remission(self):
+        assert detect_responder_status("patient in remission") == "responder"
+
+    def test_refractory(self):
+        assert detect_responder_status("refractory to treatment") == "non-responder"
+
+    def test_primary_response_responder(self):
+        assert detect_responder_status("primary response: Responder") == "responder"
+
+    def test_primary_response_non_responder(self):
+        assert detect_responder_status("primary response: Non-responder") == "non-responder"
+
+
+class TestExtractResponderFromCharacteristics:
+    def test_response_key(self):
+        chars = {"response": "Responder"}
+        assert extract_responder_from_characteristics(chars) == "responder"
+
+    def test_primary_response_key(self):
+        chars = {"primary response": "Non-responder"}
+        assert extract_responder_from_characteristics(chars) == "non-responder"
+
+    def test_no_responder_key(self):
+        chars = {"tissue": "blood"}
+        assert extract_responder_from_characteristics(chars) is None
+
+
+class TestExtractTimepoint:
+    def test_week(self):
+        assert extract_timepoint("week 8 post treatment") == "W8"
+
+    def test_day(self):
+        assert extract_timepoint("day 7") == "D7"
+
+    def test_hour(self):
+        assert extract_timepoint("24h stimulation") == "H24"
+
+    def test_baseline(self):
+        assert extract_timepoint("baseline sample") == "baseline"
+
+    def test_before_treatment(self):
+        assert extract_timepoint("before initiation of treatment") == "baseline"
+
+    def test_no_timepoint(self):
+        assert extract_timepoint("normal colon biopsy") is None
+
+    def test_zero_weeks(self):
+        assert extract_timepoint("weeks fron start of treatment: 0") == "baseline"
+
+    def test_two_weeks(self):
+        assert extract_timepoint("weeks fron start of treatment: 2") == "W2"
+
+
+class TestExtractTimepointFromCharacteristics:
+    def test_weeks_key(self):
+        chars = {"weeks fron start of treatment": "2"}
+        assert extract_timepoint_from_characteristics(chars) == "W2"
+
+    def test_zero_is_baseline(self):
+        chars = {"weeks fron start of treatment": "0"}
+        assert extract_timepoint_from_characteristics(chars) == "baseline"
+
+    def test_timepoint_key(self):
+        chars = {"timepoint": "week 8"}
+        assert extract_timepoint_from_characteristics(chars) == "W8"
+
+    def test_time_before(self):
+        chars = {"time": "before initiation of treatment"}
+        assert extract_timepoint_from_characteristics(chars) == "baseline"
+
+
+class TestDetectTissue:
+    def test_colon(self):
+        assert detect_tissue("colonic biopsy") == "colon"
+
+    def test_blood(self):
+        assert detect_tissue("peripheral blood sample") == "peripheral blood"
+
+    def test_pbmc(self):
+        assert detect_tissue("pbmc isolation") == "PBMC"
+
+    def test_no_tissue(self):
+        assert detect_tissue("some random text") is None
+
+
+class TestDetectTreatment:
+    def test_drug_name(self):
+        result = detect_treatment("treated with infliximab 5mg/kg")
+        assert result == "infliximab"
+
+    def test_anti_tnf(self):
+        result = detect_treatment("anti-TNF therapy was administered")
+        assert result == "anti-tnf"
+
+    def test_no_treatment(self):
+        assert detect_treatment("normal healthy subject") is None
+
+
+class TestExtractTreatmentFromCharacteristics:
+    def test_anti_tnf_key(self):
+        chars = {"anti-tnf": "Infliximab"}
+        assert extract_treatment_from_characteristics(chars) == "Infliximab"
+
+    def test_treatment_key(self):
+        chars = {"treatment": "Anti-TNF"}
+        assert extract_treatment_from_characteristics(chars) == "Anti-TNF"
+
+    def test_drug_in_value(self):
+        chars = {"agent": "adalimumab 40mg"}
+        assert extract_treatment_from_characteristics(chars) == "adalimumab 40mg"
+
+    def test_no_treatment(self):
+        chars = {"tissue": "blood", "gender": "male"}
+        assert extract_treatment_from_characteristics(chars) is None
+
+
+class TestDetectSampleAcquisition:
+    def test_biopsy(self):
+        assert detect_sample_acquisition("endoscopic biopsy of colon") == "endoscopic biopsy"
+
+    def test_blood_draw(self):
+        assert detect_sample_acquisition("blood draw from patient") == "blood draw"
+
+    def test_no_acquisition(self):
+        assert detect_sample_acquisition("some random text") is None
+
+
+class TestParseCharacteristics:
+    def test_colon_separator(self):
+        chars = parse_characteristics(["tissue: colon", "gender: male"])
+        assert chars["tissue"] == "colon"
+        assert chars["gender"] == "male"
+
+    def test_equals_separator(self):
+        chars = parse_characteristics(["tissue=colon"])
+        assert chars["tissue"] == "colon"
+
+    def test_no_separator(self):
+        chars = parse_characteristics(["some value"])
+        assert "field_0" in chars
+
+    def test_real_geo_characteristics(self):
+        """Test with real characteristics from GSE159034."""
+        chars = parse_characteristics([
+            "tissue: Blood",
+            "primary response: Responder",
+            "weeks fron start of treatment: 0",
+            "anti-tnf: Infliximab",
+            "disease state: pediatric inflammatory bowel disease",
+        ])
+        assert chars["tissue"] == "Blood"
+        assert chars["primary response"] == "Responder"
+        assert chars["weeks fron start of treatment"] == "0"
+        assert chars["anti-tnf"] == "Infliximab"
+        assert chars["disease state"] == "pediatric inflammatory bowel disease"
+
+
+class TestExtractFromCharacteristics:
+    def test_gender(self):
+        chars = {"gender": "male", "age": "45"}
+        assert extract_gender_from_characteristics(chars) == "male"
+
+    def test_gender_sex_key(self):
+        chars = {"sex": "female"}
+        assert extract_gender_from_characteristics(chars) == "female"
+
+    def test_age(self):
+        chars = {"age": "45 years"}
+        assert extract_age_from_characteristics(chars) == "45 years"
+
+    def test_disease(self):
+        chars = {"disease": "ulcerative colitis"}
+        assert extract_disease_from_characteristics(chars) == "ulcerative colitis"

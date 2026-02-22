@@ -1,0 +1,120 @@
+"""Configuration management for GEOtcha."""
+
+from __future__ import annotations
+
+import tomllib
+from pathlib import Path
+from typing import Optional
+
+from platformdirs import user_config_dir, user_cache_dir, user_data_dir
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _geotcha_config_dir() -> Path:
+    return Path(user_config_dir("geotcha", ensure_exists=True))
+
+
+def _geotcha_cache_dir() -> Path:
+    return Path(user_cache_dir("geotcha", ensure_exists=True))
+
+
+def _geotcha_data_dir() -> Path:
+    return Path(user_data_dir("geotcha", ensure_exists=True))
+
+
+def _load_toml_config() -> dict:
+    """Load config from ~/.config/geotcha/config.toml if it exists."""
+    config_file = _geotcha_config_dir() / "config.toml"
+    if config_file.exists():
+        with open(config_file, "rb") as f:
+            return tomllib.load(f)
+    return {}
+
+
+class Settings(BaseSettings):
+    """GEOtcha configuration.
+
+    Priority: CLI flags > env vars > config.toml > defaults.
+    """
+
+    model_config = SettingsConfigDict(
+        env_prefix="GEOTCHA_",
+        env_file=".env",
+        extra="ignore",
+    )
+
+    # NCBI settings
+    ncbi_api_key: Optional[str] = Field(default=None, description="NCBI API key for higher rate limits")
+    ncbi_email: Optional[str] = Field(default=None, description="Email for NCBI Entrez")
+    ncbi_tool: str = Field(default="geotcha", description="Tool name for NCBI Entrez")
+    rate_limit: float = Field(default=3.0, description="Requests per second (3 without key, 10 with)")
+
+    # Output settings
+    output_dir: Path = Field(default=Path("./output"), description="Default output directory")
+    output_format: str = Field(default="csv", description="Output format: csv or tsv")
+
+    # Cache settings
+    cache_dir: Optional[Path] = Field(default=None, description="Cache directory for SOFT files")
+    cache_ttl_days: int = Field(default=7, description="Cache TTL in days")
+
+    # Pipeline settings
+    default_subset_size: int = Field(default=5, description="Default subset size for test runs")
+    per_gse_timeout: int = Field(default=120, description="Timeout per GSE in seconds")
+    max_retries: int = Field(default=3, description="Max retries for API calls")
+
+    # LLM settings
+    llm_provider: Optional[str] = Field(default=None, description="LLM provider: openai, anthropic, ollama")
+    llm_model: Optional[str] = Field(default=None, description="LLM model name")
+    llm_api_key: Optional[str] = Field(default=None, description="LLM API key")
+
+    # Data directory for runs
+    data_dir: Optional[Path] = Field(default=None, description="Directory for run state files")
+
+    def get_cache_dir(self) -> Path:
+        d = self.cache_dir or _geotcha_cache_dir() / "soft_files"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    def get_data_dir(self) -> Path:
+        d = self.data_dir or _geotcha_data_dir() / "runs"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    def get_effective_rate_limit(self) -> float:
+        if self.ncbi_api_key:
+            return 10.0
+        return 3.0
+
+    @classmethod
+    def load(cls, **overrides) -> Settings:
+        """Load settings from config file, env vars, and overrides."""
+        toml_config = _load_toml_config()
+        merged = {**toml_config, **{k: v for k, v in overrides.items() if v is not None}}
+        return cls(**merged)
+
+
+def get_config_path() -> Path:
+    return _geotcha_config_dir() / "config.toml"
+
+
+def save_config(key: str, value: str) -> None:
+    """Save a key-value pair to the config TOML file."""
+    config_path = get_config_path()
+    config: dict = {}
+    if config_path.exists():
+        with open(config_path, "rb") as f:
+            config = tomllib.load(f)
+    config[key] = value
+    # Write TOML manually (tomllib is read-only)
+    lines = []
+    for k, v in config.items():
+        if isinstance(v, str):
+            lines.append(f'{k} = "{v}"')
+        elif isinstance(v, bool):
+            lines.append(f"{k} = {'true' if v else 'false'}")
+        elif isinstance(v, (int, float)):
+            lines.append(f"{k} = {v}")
+        else:
+            lines.append(f'{k} = "{v}"')
+    config_path.write_text("\n".join(lines) + "\n")

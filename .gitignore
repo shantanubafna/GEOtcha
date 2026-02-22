@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Environment
+.env
+.env.*
+
+# Claude Code
+.claude/
+
+# Internal spec (not for distribution)
+GEOtcha.md
+
+# Claude Code project instructions
+CLAUDE.md
+
+# Test output directories
+output/
+*_output/
+*_test/
+
+# Cached GEO files
+*.soft
+*.soft.gz
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
