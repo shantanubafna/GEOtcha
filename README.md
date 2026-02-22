@@ -1,5 +1,10 @@
 # GEOtcha
 
+[![CI](https://github.com/shantanubafna/GEOtcha/actions/workflows/ci.yml/badge.svg)](https://github.com/shantanubafna/GEOtcha/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/geotcha)](https://pypi.org/project/geotcha/)
+[![Python](https://img.shields.io/pypi/pyversions/geotcha)](https://pypi.org/project/geotcha/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Extract and harmonize RNA-seq metadata from NCBI GEO.
 
 GEOtcha is a CLI tool that helps researchers search GEO by disease keyword, filter to human RNA-seq datasets, extract structured metadata at both series (GSE) and sample (GSM) levels, and harmonize the results into standardized output files.
