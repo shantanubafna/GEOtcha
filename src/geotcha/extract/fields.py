@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from typing import Optional
-
 
 # Patterns for responder status detection
 RESPONDER_PATTERNS = [
@@ -149,7 +147,7 @@ ACQUISITION_KEYWORDS = {
 }
 
 
-def detect_responder_status(text: str) -> Optional[str]:
+def detect_responder_status(text: str) -> str | None:
     """Detect responder/non-responder status from text."""
     for pattern, status in RESPONDER_PATTERNS:
         if pattern.search(text):
@@ -157,7 +155,7 @@ def detect_responder_status(text: str) -> Optional[str]:
     return None
 
 
-def extract_responder_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_responder_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract responder status from parsed characteristics."""
     responder_keys = [
         "response", "primary response", "responder", "responder status",
@@ -175,7 +173,7 @@ def extract_responder_from_characteristics(chars: dict[str, str]) -> Optional[st
     return None
 
 
-def extract_timepoint(text: str) -> Optional[str]:
+def extract_timepoint(text: str) -> str | None:
     """Extract timepoint from text and normalize to standard format."""
     for pattern, prefix in TIMEPOINT_PATTERNS:
         match = pattern.search(text)
@@ -190,7 +188,7 @@ def extract_timepoint(text: str) -> Optional[str]:
     return None
 
 
-def extract_timepoint_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_timepoint_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract timepoint from parsed characteristics."""
     for key in TIMEPOINT_CHAR_KEYS:
         if key in chars:
@@ -225,7 +223,7 @@ def extract_timepoint_from_characteristics(chars: dict[str, str]) -> Optional[st
     return None
 
 
-def extract_treatment_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_treatment_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract treatment from parsed characteristics.
 
     Looks for treatment-specific keys and known drug names in values.
@@ -245,7 +243,7 @@ def extract_treatment_from_characteristics(chars: dict[str, str]) -> Optional[st
     return None
 
 
-def detect_treatment(text: str) -> Optional[str]:
+def detect_treatment(text: str) -> str | None:
     """Detect treatment from free text, returning a clean drug name or description.
 
     Prefers returning just the drug name rather than surrounding context.
@@ -266,7 +264,7 @@ def detect_treatment(text: str) -> Optional[str]:
     return None
 
 
-def detect_tissue(text: str) -> Optional[str]:
+def detect_tissue(text: str) -> str | None:
     """Detect tissue from text using keyword matching."""
     text_lower = text.lower()
     # Check longer phrases first to avoid partial matches
@@ -276,7 +274,7 @@ def detect_tissue(text: str) -> Optional[str]:
     return None
 
 
-def detect_sample_acquisition(text: str) -> Optional[str]:
+def detect_sample_acquisition(text: str) -> str | None:
     """Detect sample acquisition method from text."""
     text_lower = text.lower()
     for keyword in sorted(ACQUISITION_KEYWORDS, key=len, reverse=True):
@@ -285,7 +283,7 @@ def detect_sample_acquisition(text: str) -> Optional[str]:
     return None
 
 
-def extract_sample_acquisition_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_sample_acquisition_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract sample acquisition from parsed characteristics."""
     for key in ACQUISITION_CHAR_KEYS:
         if key in chars:
@@ -293,7 +291,7 @@ def extract_sample_acquisition_from_characteristics(chars: dict[str, str]) -> Op
     return None
 
 
-def extract_clinical_severity_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_clinical_severity_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract clinical severity endpoint from parsed characteristics."""
     for key in SEVERITY_CHAR_KEYS:
         if key in chars:
@@ -306,7 +304,7 @@ def extract_clinical_severity_from_characteristics(chars: dict[str, str]) -> Opt
     return None
 
 
-def extract_cell_type_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_cell_type_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract cell type from parsed characteristics."""
     for key in CELL_TYPE_CHAR_KEYS:
         if key in chars:
@@ -334,7 +332,7 @@ def parse_characteristics(characteristics_list: list[str]) -> dict[str, str]:
     return parsed
 
 
-def extract_gender_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_gender_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract gender from parsed characteristics."""
     gender_keys = ["gender", "sex", "Sex", "Gender"]
     for key in gender_keys:
@@ -343,7 +341,7 @@ def extract_gender_from_characteristics(chars: dict[str, str]) -> Optional[str]:
     return None
 
 
-def extract_age_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_age_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract age from parsed characteristics."""
     age_keys = ["age", "age (years)", "age_years", "patient age", "age at diagnosis"]
     for key in age_keys:
@@ -352,7 +350,7 @@ def extract_age_from_characteristics(chars: dict[str, str]) -> Optional[str]:
     return None
 
 
-def extract_disease_from_characteristics(chars: dict[str, str]) -> Optional[str]:
+def extract_disease_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract disease from parsed characteristics."""
     disease_keys = [
         "disease", "diagnosis", "condition", "disease state",
@@ -364,7 +362,7 @@ def extract_disease_from_characteristics(chars: dict[str, str]) -> Optional[str]
     return None
 
 
-def aggregate_sample_field(samples: list, field: str) -> Optional[str]:
+def aggregate_sample_field(samples: list, field: str) -> str | None:
     """Aggregate a field across samples into a summary string.
 
     Returns the most common non-None value, or a semicolon-separated list

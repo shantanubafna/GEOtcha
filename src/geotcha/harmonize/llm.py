@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Optional
 
-from geotcha.models import GSERecord, GSMRecord
+from geotcha.models import GSERecord
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ Rules:
 Respond with valid JSON only."""
 
 
-def _get_llm_client(provider: str, api_key: Optional[str] = None):
+def _get_llm_client(provider: str, api_key: str | None = None):
     """Get an LLM client based on provider."""
     if provider == "openai":
         from openai import OpenAI
@@ -45,7 +44,7 @@ def _get_llm_client(provider: str, api_key: Optional[str] = None):
         raise ValueError(f"Unknown LLM provider: {provider}")
 
 
-def _call_llm(client, provider: str, prompt: str, model: Optional[str] = None) -> str:
+def _call_llm(client, provider: str, prompt: str, model: str | None = None) -> str:
     """Make an LLM API call."""
     if provider == "anthropic":
         model = model or "claude-haiku-4-5-20251001"
@@ -70,7 +69,8 @@ def _call_llm(client, provider: str, prompt: str, model: Optional[str] = None) -
         return response.choices[0].message.content
 
 
-RELEVANCE_PROMPT = """You are a biomedical dataset relevance classifier. Given a disease query and a list
+RELEVANCE_PROMPT = """You are a biomedical dataset relevance classifier. \
+Given a disease query and a list
 of GEO dataset summaries, determine whether each dataset is relevant to the disease query.
 
 For each dataset, respond with a JSON object containing:
@@ -159,10 +159,10 @@ def llm_check_relevance(
 
 
 def llm_harmonize_fields(
-    fields: dict[str, Optional[str]],
+    fields: dict[str, str | None],
     provider: str = "openai",
-    api_key: Optional[str] = None,
-    model: Optional[str] = None,
+    api_key: str | None = None,
+    model: str | None = None,
 ) -> dict[str, dict]:
     """Use LLM to harmonize a set of metadata fields.
 
@@ -188,8 +188,8 @@ def llm_harmonize_fields(
 def llm_harmonize_record(
     record: GSERecord,
     provider: str = "openai",
-    api_key: Optional[str] = None,
-    model: Optional[str] = None,
+    api_key: str | None = None,
+    model: str | None = None,
 ) -> GSERecord:
     """Apply LLM harmonization to a GSERecord.
 

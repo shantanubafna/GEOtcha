@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from typing import Optional
 
 from geotcha.harmonize.ontology import lookup_disease, lookup_tissue
 from geotcha.models import GSERecord, GSMRecord
@@ -43,14 +42,14 @@ TIMEPOINT_PATTERNS = [
 ]
 
 
-def normalize_gender(raw: Optional[str]) -> Optional[str]:
+def normalize_gender(raw: str | None) -> str | None:
     """Normalize gender to male/female/unknown."""
     if not raw:
         return None
     return GENDER_MAP.get(raw.strip().lower())
 
 
-def normalize_age(raw: Optional[str]) -> Optional[str]:
+def normalize_age(raw: str | None) -> str | None:
     """Normalize age to numeric years format."""
     if not raw:
         return None
@@ -63,7 +62,7 @@ def normalize_age(raw: Optional[str]) -> Optional[str]:
     return raw.strip()
 
 
-def normalize_tissue(raw: Optional[str]) -> Optional[str]:
+def normalize_tissue(raw: str | None) -> str | None:
     """Normalize tissue using UBERON ontology lookup."""
     if not raw:
         return None
@@ -73,7 +72,7 @@ def normalize_tissue(raw: Optional[str]) -> Optional[str]:
     return raw.strip().lower()
 
 
-def normalize_disease(raw: Optional[str]) -> Optional[str]:
+def normalize_disease(raw: str | None) -> str | None:
     """Normalize disease using disease ontology lookup."""
     if not raw:
         return None
@@ -83,7 +82,7 @@ def normalize_disease(raw: Optional[str]) -> Optional[str]:
     return raw.strip().lower()
 
 
-def normalize_timepoint(raw: Optional[str]) -> Optional[str]:
+def normalize_timepoint(raw: str | None) -> str | None:
     """Normalize timepoint to standard format (e.g., W4, D7)."""
     if not raw:
         return None
@@ -97,7 +96,7 @@ def normalize_timepoint(raw: Optional[str]) -> Optional[str]:
     return raw
 
 
-def normalize_treatment(raw: Optional[str]) -> Optional[str]:
+def normalize_treatment(raw: str | None) -> str | None:
     """Normalize treatment string.
 
     For now, just clean up whitespace and standardize casing.

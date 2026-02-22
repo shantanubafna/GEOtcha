@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -30,7 +30,7 @@ def version_callback(value: bool) -> None:
 @app.callback()
 def main(
     version: Annotated[
-        Optional[bool],
+        bool | None,
         typer.Option("--version", "-v", callback=version_callback, is_eager=True),
     ] = None,
 ) -> None:
@@ -41,15 +41,15 @@ def main(
 def search(
     query: Annotated[str, typer.Argument(help="Disease/condition keyword to search")],
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--output", "-o", help="Output directory"),
     ] = None,
     api_key: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--api-key", help="NCBI API key"),
     ] = None,
     email: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--email", help="Email for NCBI Entrez"),
     ] = None,
 ) -> None:
@@ -57,8 +57,8 @@ def search(
     from geotcha.config import Settings
     from geotcha.exceptions import GEOtchaError
     from geotcha.search.entrez import search_geo
-    from geotcha.search.query_builder import build_query
     from geotcha.search.filters import filter_results
+    from geotcha.search.query_builder import build_query
 
     try:
         settings = Settings.load(
@@ -98,7 +98,7 @@ def extract(
         typer.Argument(help="GSE IDs to extract metadata from"),
     ],
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--output", "-o", help="Output directory"),
     ] = None,
     harmonize: Annotated[
@@ -106,7 +106,7 @@ def extract(
         typer.Option("--harmonize", help="Apply harmonization rules"),
     ] = False,
     api_key: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--api-key", help="NCBI API key"),
     ] = None,
 ) -> None:
@@ -130,11 +130,11 @@ def extract(
 def run(
     query: Annotated[str, typer.Argument(help="Disease/condition keyword to search")],
     subset: Annotated[
-        Optional[int],
+        int | None,
         typer.Option("--subset", "-s", help="Process a subset first for validation"),
     ] = None,
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option("--output", "-o", help="Output directory"),
     ] = None,
     harmonize: Annotated[
@@ -146,15 +146,15 @@ def run(
         typer.Option("--llm", help="Use LLM for harmonization"),
     ] = False,
     llm_provider: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--llm-provider", help="LLM provider: openai, anthropic, ollama"),
     ] = None,
     api_key: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--api-key", help="NCBI API key"),
     ] = None,
     email: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--email", help="Email for NCBI Entrez"),
     ] = None,
 ) -> None:
@@ -212,7 +212,7 @@ def config_set(
     value: Annotated[str, typer.Argument(help="Configuration value")],
 ) -> None:
     """Set a configuration value."""
-    from geotcha.config import save_config, get_config_path
+    from geotcha.config import get_config_path, save_config
 
     save_config(key, value)
     console.print(f"[green]Set {key} in {get_config_path()}[/green]")

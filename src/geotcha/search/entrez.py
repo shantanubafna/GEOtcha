@@ -7,7 +7,7 @@ import urllib.error
 from typing import Any
 
 from Bio import Entrez
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from geotcha.config import Settings
 from geotcha.exceptions import NetworkError
@@ -69,7 +69,7 @@ def search_geo(query: str, settings: Settings) -> list[str]:
         return all_ids
     except NetworkError:
         raise
-    except (urllib.error.URLError, OSError, IOError) as e:
+    except (urllib.error.URLError, OSError) as e:
         raise NetworkError(
             f"Failed to connect to NCBI. Check your internet connection and try again. Details: {e}"
         ) from e
@@ -117,9 +117,10 @@ def get_summaries(ids: list[str], settings: Settings) -> list[dict[str, Any]]:
         return summaries
     except NetworkError:
         raise
-    except (urllib.error.URLError, OSError, IOError) as e:
+    except (urllib.error.URLError, OSError) as e:
         raise NetworkError(
-            f"Failed to fetch summaries from NCBI. Check your internet connection and try again. Details: {e}"
+            "Failed to fetch summaries from NCBI. "
+            f"Check your internet connection and try again. Details: {e}"
         ) from e
 
 

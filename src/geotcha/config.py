@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import tomllib
 from pathlib import Path
-from typing import Optional
 
-from platformdirs import user_config_dir, user_cache_dir, user_data_dir
+import tomllib
+from platformdirs import user_cache_dir, user_config_dir, user_data_dir
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -45,17 +44,21 @@ class Settings(BaseSettings):
     )
 
     # NCBI settings
-    ncbi_api_key: Optional[str] = Field(default=None, description="NCBI API key for higher rate limits")
-    ncbi_email: Optional[str] = Field(default=None, description="Email for NCBI Entrez")
+    ncbi_api_key: str | None = Field(
+        default=None, description="NCBI API key for higher rate limits",
+    )
+    ncbi_email: str | None = Field(default=None, description="Email for NCBI Entrez")
     ncbi_tool: str = Field(default="geotcha", description="Tool name for NCBI Entrez")
-    rate_limit: float = Field(default=3.0, description="Requests per second (3 without key, 10 with)")
+    rate_limit: float = Field(
+        default=3.0, description="Requests per second (3 without key, 10 with)",
+    )
 
     # Output settings
     output_dir: Path = Field(default=Path("./output"), description="Default output directory")
     output_format: str = Field(default="csv", description="Output format: csv or tsv")
 
     # Cache settings
-    cache_dir: Optional[Path] = Field(default=None, description="Cache directory for SOFT files")
+    cache_dir: Path | None = Field(default=None, description="Cache directory for SOFT files")
     cache_ttl_days: int = Field(default=7, description="Cache TTL in days")
 
     # Pipeline settings
@@ -64,12 +67,14 @@ class Settings(BaseSettings):
     max_retries: int = Field(default=3, description="Max retries for API calls")
 
     # LLM settings
-    llm_provider: Optional[str] = Field(default=None, description="LLM provider: openai, anthropic, ollama")
-    llm_model: Optional[str] = Field(default=None, description="LLM model name")
-    llm_api_key: Optional[str] = Field(default=None, description="LLM API key")
+    llm_provider: str | None = Field(
+        default=None, description="LLM provider: openai, anthropic, ollama",
+    )
+    llm_model: str | None = Field(default=None, description="LLM model name")
+    llm_api_key: str | None = Field(default=None, description="LLM API key")
 
     # Data directory for runs
-    data_dir: Optional[Path] = Field(default=None, description="Directory for run state files")
+    data_dir: Path | None = Field(default=None, description="Directory for run state files")
 
     def get_cache_dir(self) -> Path:
         d = self.cache_dir or _geotcha_cache_dir() / "soft_files"

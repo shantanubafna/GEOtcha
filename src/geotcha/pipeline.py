@@ -6,14 +6,12 @@ import json
 import logging
 import uuid
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 
 from geotcha.config import Settings
-from geotcha.exceptions import ExtractionError
 from geotcha.export.writers import write_all
 from geotcha.extract.gse_parser import parse_gse
 from geotcha.models import GSERecord
@@ -106,7 +104,7 @@ def _harmonize_record(record: GSERecord, use_llm: bool = False) -> GSERecord:
 def run_pipeline(
     query: str,
     settings: Settings,
-    subset_size: Optional[int] = None,
+    subset_size: int | None = None,
     harmonize: bool = False,
     use_llm: bool = False,
     console: Console | None = None,
@@ -137,7 +135,8 @@ def run_pipeline(
 
     console.print(
         f"Found [bold]{len(raw_ids)}[/bold] datasets. "
-        f"After filtering (Homo sapiens + RNA-seq + relevance): [bold]{len(filtered_ids)}[/bold] datasets."
+        "After filtering (Homo sapiens + RNA-seq + relevance): "
+        f"[bold]{len(filtered_ids)}[/bold] datasets."
     )
 
     if not filtered_ids:
@@ -185,7 +184,9 @@ def run_pipeline(
         except ImportError:
             logger.warning("LLM dependencies not installed. Skipping LLM relevance filtering.")
         except Exception as e:
-            logger.warning(f"LLM relevance filtering failed: {e}. Continuing with rule-based results.")
+            logger.warning(
+                f"LLM relevance filtering failed: {e}. Continuing with rule-based results.",
+            )
 
     # Save state
     state = {
@@ -260,7 +261,7 @@ def run_pipeline(
         state["status"] = "complete"
         _save_state(run_id, state, settings)
 
-    console.print(f"\n[bold green]Pipeline complete![/bold green]")
+    console.print("\n[bold green]Pipeline complete![/bold green]")
     console.print(f"[dim]Run ID: {run_id}[/dim]")
     console.print(f"[dim]Output: {output_dir}[/dim]")
 
@@ -280,8 +281,8 @@ def run_extract(
 
     records = _extract_batch(gse_ids, settings, console, harmonize)
 
-    paths = write_all(records, output_dir, settings.output_format, harmonize)
-    console.print(f"\n[bold green]Extraction complete![/bold green]")
+    write_all(records, output_dir, settings.output_format, harmonize)
+    console.print("\n[bold green]Extraction complete![/bold green]")
     console.print(f"[dim]Output: {output_dir}[/dim]")
 
 
@@ -320,4 +321,4 @@ def resume_run(
     state["status"] = "complete"
     _save_state(run_id, state, settings)
 
-    console.print(f"\n[bold green]Resume complete![/bold green]")
+    console.print("\n[bold green]Resume complete![/bold green]")
