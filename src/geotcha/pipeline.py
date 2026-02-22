@@ -45,6 +45,7 @@ def _extract_batch(
     console: Console,
     harmonize: bool = False,
     use_llm: bool = False,
+    include_scrna: bool = False,
 ) -> list[GSERecord]:
     """Extract metadata for a batch of GSE IDs with progress tracking."""
     records: list[GSERecord] = []
@@ -62,7 +63,7 @@ def _extract_batch(
         for gse_id in gse_ids:
             try:
                 progress.update(task, description=f"Processing {gse_id}...")
-                record = parse_gse(gse_id, settings)
+                record = parse_gse(gse_id, settings, include_scrna=include_scrna)
 
                 if harmonize:
                     record = _harmonize_record(record, use_llm)
@@ -213,7 +214,10 @@ def run_pipeline(
         console.print(f"\nProcessing {len(subset_ids)}/{len(filtered_ids)} datasets...")
 
         # Extract subset
-        records = _extract_batch(subset_ids, settings, console, harmonize, use_llm)
+        records = _extract_batch(
+            subset_ids, settings, console, harmonize, use_llm,
+            include_scrna=settings.include_scrna,
+        )
 
         # Export subset results
         paths = write_all(records, output_dir, settings.output_format, harmonize)
@@ -242,7 +246,8 @@ def run_pipeline(
 
             console.print(f"\nProcessing remaining {len(remaining_ids)} datasets...")
             more_records = _extract_batch(
-                remaining_ids, settings, console, harmonize, use_llm
+                remaining_ids, settings, console, harmonize, use_llm,
+                include_scrna=settings.include_scrna,
             )
             records.extend(more_records)
 
@@ -254,7 +259,10 @@ def run_pipeline(
     else:
         # No subset — process all
         console.print(f"\nProcessing {len(filtered_ids)} datasets...")
-        records = _extract_batch(filtered_ids, settings, console, harmonize, use_llm)
+        records = _extract_batch(
+            filtered_ids, settings, console, harmonize, use_llm,
+            include_scrna=settings.include_scrna,
+        )
         paths = write_all(records, output_dir, settings.output_format, harmonize)
 
         state["processed_gse_ids"] = filtered_ids
@@ -279,7 +287,10 @@ def run_extract(
     output_dir = settings.output_dir
     console.print(f"Extracting metadata for {len(gse_ids)} GSE ID(s)...")
 
-    records = _extract_batch(gse_ids, settings, console, harmonize)
+    records = _extract_batch(
+        gse_ids, settings, console, harmonize,
+        include_scrna=settings.include_scrna,
+    )
 
     write_all(records, output_dir, settings.output_format, harmonize)
     console.print("\n[bold green]Extraction complete![/bold green]")

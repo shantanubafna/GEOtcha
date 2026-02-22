@@ -1,6 +1,6 @@
-"""Tests for search result filtering, including relevance checks."""
+"""Tests for search result filtering, including relevance and single-cell checks."""
 
-from geotcha.search.filters import _is_relevant_to_query
+from geotcha.search.filters import _is_relevant_to_query, _is_single_cell
 
 
 class TestIsRelevantToQuery:
@@ -68,3 +68,61 @@ class TestIsRelevantToQuery:
             "summary": "Saccharomyces cerevisiae growth curves.",
         }
         assert _is_relevant_to_query(summary, "IBD") is False
+
+
+class TestIsSingleCell:
+    def test_scrna_in_title(self):
+        """Title containing 'scRNA-seq' should be detected as single-cell."""
+        summary = {
+            "title": "scRNA-seq of human colon in IBD",
+            "summary": "We profiled gene expression at single-cell resolution.",
+        }
+        assert _is_single_cell(summary) is True
+
+    def test_10x_genomics_in_summary(self):
+        """Summary mentioning '10x Genomics Chromium' should be detected."""
+        summary = {
+            "title": "Immune cell atlas of ulcerative colitis",
+            "summary": "Libraries were prepared using 10x Genomics Chromium platform.",
+        }
+        assert _is_single_cell(summary) is True
+
+    def test_single_cell_in_title(self):
+        """Title with 'single-cell' should be detected."""
+        summary = {
+            "title": "Single-cell transcriptomics of Crohn's disease",
+            "summary": "Analysis of intestinal immune cells.",
+        }
+        assert _is_single_cell(summary) is True
+
+    def test_single_nucleus_detected(self):
+        """'single-nucleus' should be detected as single-cell."""
+        summary = {
+            "title": "Single-nucleus RNA-seq of brain tissue",
+            "summary": "snRNA-seq profiling.",
+        }
+        assert _is_single_cell(summary) is True
+
+    def test_dropseq_detected(self):
+        """'Drop-seq' should be detected as single-cell."""
+        summary = {
+            "title": "Drop-seq analysis of gut epithelium",
+            "summary": "Droplet-based single-cell sequencing.",
+        }
+        assert _is_single_cell(summary) is True
+
+    def test_bulk_rnaseq_not_flagged(self):
+        """Normal bulk RNA-seq should NOT be flagged as single-cell."""
+        summary = {
+            "title": "Bulk RNA-seq of IBD colon biopsies",
+            "summary": "Transcriptomic analysis of paired biopsies from UC patients.",
+        }
+        assert _is_single_cell(summary) is False
+
+    def test_standard_rnaseq_not_flagged(self):
+        """Standard RNA-seq dataset without single-cell keywords passes."""
+        summary = {
+            "title": "Gene expression in pediatric IBD",
+            "summary": "RNA-seq of whole blood samples from IBD patients and controls.",
+        }
+        assert _is_single_cell(summary) is False

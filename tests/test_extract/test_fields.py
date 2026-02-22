@@ -1,4 +1,4 @@
-"""Tests for field extraction utilities."""
+"""Tests for field extraction utilities and GSM-level filtering."""
 
 from geotcha.extract.fields import (
     detect_responder_status,
@@ -14,6 +14,8 @@ from geotcha.extract.fields import (
     extract_treatment_from_characteristics,
     parse_characteristics,
 )
+from geotcha.extract.gsm_parser import _filter_human_rnaseq, _is_single_cell_sample
+from geotcha.models import GSMRecord
 
 
 class TestDetectResponderStatus:
@@ -202,3 +204,72 @@ class TestExtractFromCharacteristics:
     def test_disease(self):
         chars = {"disease": "ulcerative colitis"}
         assert extract_disease_from_characteristics(chars) == "ulcerative colitis"
+
+
+# --- GSM-level single-cell filtering tests ---
+
+
+def _make_gsm(
+    library_source: str = "transcriptomic",
+    organism: str = "Homo sapiens",
+    library_strategy: str = "RNA-Seq",
+) -> GSMRecord:
+    """Helper to create a minimal GSMRecord for testing."""
+    return GSMRecord(
+        gsm_id="GSM000001",
+        gse_id="GSE000001",
+        title="test sample",
+        source_name="test",
+        organism=organism,
+        library_strategy=library_strategy,
+        library_source=library_source,
+    )
+
+
+class TestIsSingleCellSample:
+    def test_transcriptomic_single_cell(self):
+        """library_source 'transcriptomic single cell' should be detected."""
+        gsm = _make_gsm(library_source="transcriptomic single cell")
+        assert _is_single_cell_sample(gsm) is True
+
+    def test_transcriptomic_passes(self):
+        """Standard 'transcriptomic' library_source should NOT be flagged."""
+        gsm = _make_gsm(library_source="transcriptomic")
+        assert _is_single_cell_sample(gsm) is False
+
+    def test_empty_library_source(self):
+        """Empty/missing library_source should NOT be flagged."""
+        gsm = _make_gsm(library_source="")
+        assert _is_single_cell_sample(gsm) is False
+
+
+class TestFilterHumanRnaseqSingleCell:
+    def test_single_cell_filtered_by_default(self):
+        """Single-cell samples should be excluded when include_scrna=False."""
+        records = [
+            _make_gsm(library_source="transcriptomic single cell"),
+            _make_gsm(library_source="transcriptomic"),
+        ]
+        filtered = _filter_human_rnaseq(records, include_scrna=False)
+        assert len(filtered) == 1
+        assert filtered[0].library_source == "transcriptomic"
+
+    def test_single_cell_included_with_flag(self):
+        """Single-cell samples should pass when include_scrna=True."""
+        records = [
+            _make_gsm(library_source="transcriptomic single cell"),
+            _make_gsm(library_source="transcriptomic"),
+        ]
+        filtered = _filter_human_rnaseq(records, include_scrna=True)
+        assert len(filtered) == 2
+
+    def test_mixed_gse_keeps_bulk_only(self):
+        """In a mixed GSE, only bulk samples survive when include_scrna=False."""
+        records = [
+            _make_gsm(library_source="transcriptomic single cell"),
+            _make_gsm(library_source="transcriptomic single cell"),
+            _make_gsm(library_source="transcriptomic"),
+        ]
+        filtered = _filter_human_rnaseq(records, include_scrna=False)
+        assert len(filtered) == 1
+        assert filtered[0].library_source == "transcriptomic"

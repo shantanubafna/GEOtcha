@@ -35,6 +35,7 @@ def parse_gsm_samples(
     gse: GEOparse.GEOTypes.GSE,
     gse_id: str,
     settings: Settings,
+    include_scrna: bool = False,
 ) -> list[GSMRecord]:
     """Parse all GSM samples from a GSE object.
 
@@ -133,15 +134,27 @@ def parse_gsm_samples(
         records.append(record)
 
     # Filter to human RNA-seq samples only
-    filtered = _filter_human_rnaseq(records)
+    filtered = _filter_human_rnaseq(records, include_scrna=include_scrna)
     logger.info(
         f"{gse_id}: {len(records)} total samples, {len(filtered)} human RNA-seq samples"
     )
     return filtered
 
 
-def _filter_human_rnaseq(records: list[GSMRecord]) -> list[GSMRecord]:
-    """Filter to keep only human RNA-seq samples."""
+def _is_single_cell_sample(record: GSMRecord) -> bool:
+    """Check if a GSM sample is single-cell based on library_source."""
+    library_source = (record.library_source or "").lower()
+    return "single cell" in library_source
+
+
+def _filter_human_rnaseq(
+    records: list[GSMRecord], include_scrna: bool = False,
+) -> list[GSMRecord]:
+    """Filter to keep only human RNA-seq samples.
+
+    When include_scrna is False, samples with library_source containing
+    'single cell' (e.g. 'transcriptomic single cell') are excluded.
+    """
     filtered = []
     for r in records:
         is_human = "homo sapiens" in r.organism.lower()
@@ -150,8 +163,15 @@ def _filter_human_rnaseq(records: list[GSMRecord]) -> list[GSMRecord]:
             not r.library_strategy
             or "rna" in r.library_strategy.lower()
         )
-        if is_human and is_rnaseq:
-            filtered.append(r)
+        if not is_human or not is_rnaseq:
+            continue
+        if not include_scrna and _is_single_cell_sample(r):
+            logger.debug(
+                f"Single-cell filter rejected {r.gsm_id}: "
+                f"library_source={r.library_source!r}"
+            )
+            continue
+        filtered.append(r)
     return filtered
 
 

@@ -109,6 +109,10 @@ def extract(
         str | None,
         typer.Option("--api-key", help="NCBI API key"),
     ] = None,
+    include_scrna: Annotated[
+        bool,
+        typer.Option("--include-scrna", help="Include single-cell RNA-seq datasets"),
+    ] = False,
 ) -> None:
     """Extract metadata from specific GSE IDs."""
     from geotcha.config import Settings
@@ -116,7 +120,10 @@ def extract(
     from geotcha.pipeline import run_extract
 
     try:
-        settings = Settings.load(ncbi_api_key=api_key, output_dir=output)
+        settings = Settings.load(
+            ncbi_api_key=api_key, output_dir=output,
+            include_scrna=include_scrna or None,
+        )
         run_extract(gse_ids, settings, harmonize=harmonize, console=console)
     except GEOtchaError as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -157,6 +164,10 @@ def run(
         str | None,
         typer.Option("--email", help="Email for NCBI Entrez"),
     ] = None,
+    include_scrna: Annotated[
+        bool,
+        typer.Option("--include-scrna", help="Include single-cell RNA-seq datasets"),
+    ] = False,
 ) -> None:
     """Run the full pipeline: search, filter, extract, and export."""
     from geotcha.config import Settings
@@ -169,6 +180,7 @@ def run(
             ncbi_email=email,
             output_dir=output,
             llm_provider=llm_provider,
+            include_scrna=include_scrna or None,
         )
         run_pipeline(
             query=query,

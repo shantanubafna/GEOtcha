@@ -43,6 +43,12 @@ geotcha run "IBD" --subset 5 --output ./results/ --harmonize
 geotcha extract GSE12345 GSE67890 --output ./results/
 ```
 
+### Include single-cell RNA-seq datasets (excluded by default)
+
+```bash
+geotcha run "IBD" --subset 5 --include-scrna
+```
+
 ### With LLM harmonization
 
 ```bash
@@ -103,6 +109,27 @@ GEOtcha automatically expands disease keywords to capture related terms:
 - **IBD** → inflammatory bowel disease, ulcerative colitis, Crohn's disease (abbreviations like UC, CD are used for relevance filtering)
 - **SLE** → systemic lupus erythematosus, lupus
 - **RA** → rheumatoid arthritis
+
+## Filtering
+
+GEOtcha automatically filters search results to human RNA-seq datasets. By default, **single-cell RNA-seq datasets are excluded** (scRNA-seq, snRNA-seq, 10x Genomics, Drop-seq, etc.) since most bulk RNA-seq meta-analyses don't want these mixed in.
+
+Single-cell filtering happens at two levels:
+- **Search level**: eSummary title/summary scanned for scRNA-seq keywords
+- **Sample level**: GSM `library_source` checked for "single cell"
+
+To include single-cell datasets, use the `--include-scrna` flag:
+
+```bash
+geotcha run "IBD" --include-scrna
+geotcha extract GSE12345 --include-scrna
+```
+
+Or set it in config:
+
+```bash
+geotcha config set include_scrna true
+```
 
 ## Harmonization
 

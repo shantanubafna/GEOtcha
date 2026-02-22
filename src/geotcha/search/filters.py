@@ -12,6 +12,15 @@ from geotcha.search.query_builder import get_relevance_keywords
 
 logger = logging.getLogger(__name__)
 
+# Patterns indicating single-cell RNA-seq datasets
+SCRNA_PATTERNS = re.compile(
+    r"single[\s\-]?cell|scRNA|snRNA|scATAC|10x\s*genomics|10x\s*chromium|"
+    r"chromium|drop[\s\-]?seq|smart[\s\-]?seq2?|cel[\s\-]?seq|"
+    r"plate[\s\-]?based\s*single|inDrop|sci[\s\-]?RNA|MARS[\s\-]?seq|"
+    r"single[\s\-]?nucleus|single[\s\-]?nuclei",
+    re.IGNORECASE,
+)
+
 # Valid data types for RNA-seq
 RNASEQ_TYPES = {
     "Expression profiling by high throughput sequencing",
@@ -79,6 +88,14 @@ def _is_relevant_to_query(summary: dict[str, Any], query: str) -> bool:
     return False
 
 
+def _is_single_cell(summary: dict[str, Any]) -> bool:
+    """Check if an eSummary record looks like a single-cell RNA-seq dataset."""
+    title = str(summary.get("title", ""))
+    description = str(summary.get("summary", ""))
+    text = f"{title} {description}"
+    return bool(SCRNA_PATTERNS.search(text))
+
+
 def filter_results(
     raw_ids: list[str], settings: Settings, query: str | None = None
 ) -> list[str]:
@@ -102,9 +119,20 @@ def filter_results(
     filtered_gse_ids: list[str] = []
     seen: set[str] = set()
     relevance_rejected = 0
+    scrna_rejected = 0
 
     for summary in summaries:
         if not _is_human_rnaseq(summary):
+            continue
+
+        # Single-cell filter: skip scRNA-seq unless opted in
+        if not settings.include_scrna and _is_single_cell(summary):
+            gse_id = _extract_gse_accession(summary)
+            logger.debug(
+                f"Single-cell filter rejected {gse_id}: "
+                f"title={summary.get('title', '')!r}"
+            )
+            scrna_rejected += 1
             continue
 
         # Relevance filter: check if the dataset is about the queried disease
@@ -124,6 +152,7 @@ def filter_results(
 
     logger.info(
         f"Filtered {len(raw_ids)} raw IDs down to {len(filtered_gse_ids)} human RNA-seq GSE IDs"
-        f" ({relevance_rejected} rejected by relevance filter)"
+        f" ({relevance_rejected} rejected by relevance filter,"
+        f" {scrna_rejected} rejected as single-cell)"
     )
     return filtered_gse_ids

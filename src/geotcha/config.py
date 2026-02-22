@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     per_gse_timeout: int = Field(default=120, description="Timeout per GSE in seconds")
     max_retries: int = Field(default=3, description="Max retries for API calls")
 
+    # Filtering settings
+    include_scrna: bool = Field(
+        default=False, description="Include single-cell RNA-seq datasets",
+    )
+
     # LLM settings
     llm_provider: str | None = Field(
         default=None, description="LLM provider: openai, anthropic, ollama",

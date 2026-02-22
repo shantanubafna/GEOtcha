@@ -19,7 +19,7 @@ from geotcha.models import GSERecord
 logger = logging.getLogger(__name__)
 
 
-def parse_gse(gse_id: str, settings: Settings) -> GSERecord:
+def parse_gse(gse_id: str, settings: Settings, include_scrna: bool = False) -> GSERecord:
     """Parse a GSE entry into a structured GSERecord.
 
     Downloads the SOFT file (cached) and extracts series-level metadata.
@@ -45,7 +45,7 @@ def parse_gse(gse_id: str, settings: Settings) -> GSERecord:
     combined_text = f"{title} {summary} {overall_design}"
 
     # Parse all GSM samples first — we'll aggregate fields from them
-    samples = parse_gsm_samples(gse, gse_id, settings)
+    samples = parse_gsm_samples(gse, gse_id, settings, include_scrna=include_scrna)
 
     # Count human RNA-seq samples
     human_rnaseq_count = sum(
