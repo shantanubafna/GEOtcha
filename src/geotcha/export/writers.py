@@ -89,7 +89,7 @@ def _get_extension(fmt: str) -> str:
     return ".tsv" if fmt == "tsv" else ".csv"
 
 
-def _gse_to_row(record: GSERecord, harmonized: bool = False) -> dict:
+def gse_to_row(record: GSERecord, harmonized: bool = False) -> dict:
     """Convert a GSERecord to a flat dict for CSV output."""
     row = {
         "gse_id": record.gse_id,
@@ -182,9 +182,47 @@ def write_gse_summary(
         writer = csv.DictWriter(f, fieldnames=fields, delimiter=delimiter, extrasaction="ignore")
         writer.writeheader()
         for record in records:
-            writer.writerow(_gse_to_row(record, harmonized))
+            writer.writerow(gse_to_row(record, harmonized))
 
     logger.info(f"Wrote GSE summary: {filepath} ({len(records)} records)")
+    return filepath
+
+
+def read_gse_summary(output_dir: Path, fmt: str = "csv") -> list[dict]:
+    """Read an existing GSE summary file as a list of raw dict rows."""
+    ext = _get_extension(fmt)
+    filepath = output_dir / f"gse_summary{ext}"
+    if not filepath.exists():
+        return []
+    delimiter = _get_delimiter(fmt)
+    with open(filepath, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter=delimiter)
+        return list(reader)
+
+
+def write_gse_summary_rows(
+    rows: list[dict],
+    output_dir: Path,
+    fmt: str = "csv",
+    harmonized: bool = False,
+) -> Path:
+    """Write pre-formatted GSE summary dict rows (used by resume merge)."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ext = _get_extension(fmt)
+    filepath = output_dir / f"gse_summary{ext}"
+
+    fields = GSE_FIELDS[:]
+    if harmonized:
+        fields.extend(GSE_HARMONIZED_EXTRA_FIELDS)
+
+    delimiter = _get_delimiter(fmt)
+    with open(filepath, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fields, delimiter=delimiter, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+    logger.info(f"Wrote GSE summary (merged): {filepath} ({len(rows)} rows)")
     return filepath
 
 

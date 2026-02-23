@@ -7,7 +7,7 @@ import urllib.error
 from typing import Any
 
 from Bio import Entrez
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from geotcha.config import Settings
 from geotcha.exceptions import NetworkError
@@ -24,19 +24,22 @@ def _configure_entrez(settings: Settings) -> None:
         Entrez.api_key = settings.ncbi_api_key
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=30),
-    retry=retry_if_exception_type((IOError, RuntimeError, urllib.error.URLError, OSError)),
-)
 def _esearch(query: str, retstart: int, retmax: int, settings: Settings) -> dict[str, Any]:
-    """Execute a single eSearch call with rate limiting and retry."""
-    limiter = get_limiter(settings.get_effective_rate_limit())
-    limiter.acquire()
-    handle = Entrez.esearch(db="gds", term=query, retstart=retstart, retmax=retmax)
-    result = Entrez.read(handle)
-    handle.close()
-    return dict(result)
+    """Execute a single eSearch call with rate limiting and dynamic retry."""
+    for attempt in Retrying(
+        stop=stop_after_attempt(settings.max_retries),
+        wait=wait_exponential(multiplier=1, min=1, max=30),
+        retry=retry_if_exception_type((IOError, RuntimeError, urllib.error.URLError, OSError)),
+        reraise=True,
+    ):
+        with attempt:
+            limiter = get_limiter(settings.get_effective_rate_limit())
+            limiter.acquire()
+            handle = Entrez.esearch(db="gds", term=query, retstart=retstart, retmax=retmax)
+            result = Entrez.read(handle)
+            handle.close()
+            return dict(result)
+    raise RuntimeError("unreachable")  # pragma: no cover
 
 
 def search_geo(query: str, settings: Settings) -> list[str]:
@@ -75,19 +78,22 @@ def search_geo(query: str, settings: Settings) -> list[str]:
         ) from e
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=30),
-    retry=retry_if_exception_type((IOError, RuntimeError, urllib.error.URLError, OSError)),
-)
 def _esummary_batch(ids: list[str], settings: Settings) -> list[dict[str, Any]]:
-    """Fetch eSummary for a batch of IDs."""
-    limiter = get_limiter(settings.get_effective_rate_limit())
-    limiter.acquire()
-    handle = Entrez.esummary(db="gds", id=",".join(ids))
-    result = Entrez.read(handle)
-    handle.close()
-    return [dict(r) for r in result]
+    """Fetch eSummary for a batch of IDs with dynamic retry."""
+    for attempt in Retrying(
+        stop=stop_after_attempt(settings.max_retries),
+        wait=wait_exponential(multiplier=1, min=1, max=30),
+        retry=retry_if_exception_type((IOError, RuntimeError, urllib.error.URLError, OSError)),
+        reraise=True,
+    ):
+        with attempt:
+            limiter = get_limiter(settings.get_effective_rate_limit())
+            limiter.acquire()
+            handle = Entrez.esummary(db="gds", id=",".join(ids))
+            result = Entrez.read(handle)
+            handle.close()
+            return [dict(r) for r in result]
+    raise RuntimeError("unreachable")  # pragma: no cover
 
 
 def get_summaries(ids: list[str], settings: Settings) -> list[dict[str, Any]]:
