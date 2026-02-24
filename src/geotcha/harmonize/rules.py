@@ -3,9 +3,23 @@
 from __future__ import annotations
 
 import re
+from typing import NamedTuple
 
-from geotcha.harmonize.ontology import lookup_disease, lookup_tissue
+from geotcha.harmonize.ontology import (
+    lookup_disease_with_confidence,
+    lookup_tissue_with_confidence,
+)
 from geotcha.models import GSERecord, GSMRecord
+
+
+class NormResult(NamedTuple):
+    """Result of a normalization operation with provenance metadata."""
+
+    value: str | None
+    source: str  # "rule" or "raw_fallback"
+    confidence: float  # 1.0, 0.85, 0.70, or 0.50
+    ontology_id: str | None
+
 
 # Gender normalization
 GENDER_MAP: dict[str, str] = {
@@ -42,14 +56,17 @@ TIMEPOINT_PATTERNS = [
 ]
 
 
-def normalize_gender(raw: str | None) -> str | None:
+def normalize_gender(raw: str | None) -> NormResult | None:
     """Normalize gender to male/female/unknown."""
     if not raw:
         return None
-    return GENDER_MAP.get(raw.strip().lower())
+    result = GENDER_MAP.get(raw.strip().lower())
+    if result:
+        return NormResult(result, "rule", 1.0, None)
+    return NormResult(raw.strip().lower(), "raw_fallback", 0.50, None)
 
 
-def normalize_age(raw: str | None) -> str | None:
+def normalize_age(raw: str | None) -> NormResult | None:
     """Normalize age to numeric years format."""
     if not raw:
         return None
@@ -57,32 +74,32 @@ def normalize_age(raw: str | None) -> str | None:
     if match:
         age_val = float(match.group(1))
         if age_val == int(age_val):
-            return str(int(age_val))
-        return str(age_val)
-    return raw.strip()
+            return NormResult(str(int(age_val)), "rule", 1.0, None)
+        return NormResult(str(age_val), "rule", 1.0, None)
+    return NormResult(raw.strip(), "raw_fallback", 0.50, None)
 
 
-def normalize_tissue(raw: str | None) -> str | None:
-    """Normalize tissue using UBERON ontology lookup."""
+def normalize_tissue(raw: str | None) -> NormResult | None:
+    """Normalize tissue using UBERON ontology lookup with confidence tiers."""
     if not raw:
         return None
-    result = lookup_tissue(raw)
+    result = lookup_tissue_with_confidence(raw)
     if result:
-        return result[0]
-    return raw.strip().lower()
+        return NormResult(result[0], "rule", result[2], result[1])
+    return NormResult(raw.strip().lower(), "raw_fallback", 0.50, None)
 
 
-def normalize_disease(raw: str | None) -> str | None:
-    """Normalize disease using disease ontology lookup."""
+def normalize_disease(raw: str | None) -> NormResult | None:
+    """Normalize disease using disease ontology lookup with confidence tiers."""
     if not raw:
         return None
-    result = lookup_disease(raw)
+    result = lookup_disease_with_confidence(raw)
     if result:
-        return result[0]
-    return raw.strip().lower()
+        return NormResult(result[0], "rule", result[2], result[1])
+    return NormResult(raw.strip().lower(), "raw_fallback", 0.50, None)
 
 
-def normalize_timepoint(raw: str | None) -> str | None:
+def normalize_timepoint(raw: str | None) -> NormResult | None:
     """Normalize timepoint to standard format (e.g., W4, D7)."""
     if not raw:
         return None
@@ -91,40 +108,51 @@ def normalize_timepoint(raw: str | None) -> str | None:
         match = pattern.match(raw)
         if match:
             if prefix is None:
-                return raw.lower()
-            return f"{prefix}{match.group(1)}"
-    return raw
+                return NormResult(raw.lower(), "rule", 1.0, None)
+            return NormResult(f"{prefix}{match.group(1)}", "rule", 1.0, None)
+    return NormResult(raw, "raw_fallback", 0.50, None)
 
 
-def normalize_treatment(raw: str | None) -> str | None:
-    """Normalize treatment string.
-
-    For now, just clean up whitespace and standardize casing.
-    More sophisticated normalization (drug name standardization)
-    can be added later.
-    """
+def normalize_treatment(raw: str | None) -> NormResult | None:
+    """Normalize treatment string."""
     if not raw:
         return None
     cleaned = " ".join(raw.strip().split())
-    return cleaned
+    return NormResult(cleaned, "rule", 0.70, None)
+
+
+def _apply_norm(record, field: str, result: NormResult | None) -> None:
+    """Apply a NormResult to a record's harmonized + provenance fields."""
+    if result:
+        setattr(record, f"{field}_harmonized", result.value)
+        setattr(record, f"{field}_source", result.source)
+        setattr(record, f"{field}_confidence", result.confidence)
+        setattr(record, f"{field}_ontology_id", result.ontology_id)
 
 
 def harmonize_gsm(record: GSMRecord) -> GSMRecord:
     """Apply harmonization rules to a GSM record."""
-    record.gender_harmonized = normalize_gender(record.gender)
-    record.age_harmonized = normalize_age(record.age)
-    record.tissue_harmonized = normalize_tissue(record.tissue)
-    record.cell_type_harmonized = record.cell_type  # Pass through for now
-    record.disease_harmonized = normalize_disease(record.disease)
-    record.treatment_harmonized = normalize_treatment(record.treatment)
-    record.timepoint_harmonized = normalize_timepoint(record.timepoint)
+    _apply_norm(record, "gender", normalize_gender(record.gender))
+    _apply_norm(record, "age", normalize_age(record.age))
+    _apply_norm(record, "tissue", normalize_tissue(record.tissue))
+    _apply_norm(record, "disease", normalize_disease(record.disease))
+    _apply_norm(record, "treatment", normalize_treatment(record.treatment))
+    _apply_norm(record, "timepoint", normalize_timepoint(record.timepoint))
+
+    # Cell type: pass-through with raw_fallback provenance
+    if record.cell_type:
+        record.cell_type_harmonized = record.cell_type
+        record.cell_type_source = "raw_fallback"
+        record.cell_type_confidence = 0.50
+        record.cell_type_ontology_id = None
+
     return record
 
 
 def harmonize_gse(record: GSERecord) -> GSERecord:
     """Apply harmonization rules to a GSE record."""
-    record.tissue_harmonized = normalize_tissue(record.tissue)
-    record.disease_harmonized = normalize_disease(record.disease)
-    record.treatment_harmonized = normalize_treatment(record.treatment)
-    record.timepoint_harmonized = normalize_timepoint(record.timepoint)
+    _apply_norm(record, "tissue", normalize_tissue(record.tissue))
+    _apply_norm(record, "disease", normalize_disease(record.disease))
+    _apply_norm(record, "treatment", normalize_treatment(record.treatment))
+    _apply_norm(record, "timepoint", normalize_timepoint(record.timepoint))
     return record

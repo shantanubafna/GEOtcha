@@ -7,6 +7,7 @@ from geotcha.extract.fields import (
     detect_treatment,
     extract_age_from_characteristics,
     extract_disease_from_characteristics,
+    extract_disease_status_from_characteristics,
     extract_gender_from_characteristics,
     extract_responder_from_characteristics,
     extract_timepoint,
@@ -273,3 +274,53 @@ class TestFilterHumanRnaseqSingleCell:
         filtered = _filter_human_rnaseq(records, include_scrna=False)
         assert len(filtered) == 1
         assert filtered[0].library_source == "transcriptomic"
+
+
+class TestExtractDiseaseStatus:
+    def test_healthy_vocab(self):
+        chars = {"disease state": "healthy"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "healthy"
+        assert confidence == 1.0
+
+    def test_normal_maps_to_healthy(self):
+        chars = {"disease status": "normal"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "healthy"
+        assert confidence == 1.0
+
+    def test_control_maps_to_healthy(self):
+        chars = {"condition": "control"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "healthy"
+        assert confidence == 1.0
+
+    def test_diseased_vocab(self):
+        chars = {"disease state": "diseased"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "diseased"
+        assert confidence == 1.0
+
+    def test_active_status(self):
+        chars = {"disease state": "active"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "active"
+        assert confidence == 1.0
+
+    def test_remission_status(self):
+        chars = {"disease state": "remission"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "remission"
+        assert confidence == 1.0
+
+    def test_raw_fallback(self):
+        chars = {"disease state": "pediatric inflammatory bowel disease"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status == "pediatric inflammatory bowel disease"
+        assert confidence == 0.70
+
+    def test_no_key(self):
+        chars = {"tissue": "colon"}
+        status, confidence = extract_disease_status_from_characteristics(chars)
+        assert status is None
+        assert confidence == 0.0

@@ -204,10 +204,13 @@ def llm_harmonize_record(
 
     if gse_fields:
         result = llm_harmonize_fields(gse_fields, provider, api_key, model)
-        if "tissue" in result:
-            record.tissue_harmonized = result["tissue"].get("value")
-        if "disease" in result:
-            record.disease_harmonized = result["disease"].get("value")
+        for field in ("tissue", "disease"):
+            if field in result:
+                setattr(record, f"{field}_harmonized", result[field].get("value"))
+                setattr(record, f"{field}_source", "llm")
+                setattr(
+                    record, f"{field}_confidence", result[field].get("confidence", 0.75)
+                )
 
     # Harmonize unresolved sample-level fields
     for sample in record.samples:
@@ -221,11 +224,14 @@ def llm_harmonize_record(
 
         if sample_fields:
             result = llm_harmonize_fields(sample_fields, provider, api_key, model)
-            if "tissue" in result:
-                sample.tissue_harmonized = result["tissue"].get("value")
-            if "disease" in result:
-                sample.disease_harmonized = result["disease"].get("value")
-            if "gender" in result:
-                sample.gender_harmonized = result["gender"].get("value")
+            for field in ("tissue", "disease", "gender"):
+                if field in result:
+                    setattr(sample, f"{field}_harmonized", result[field].get("value"))
+                    setattr(sample, f"{field}_source", "llm")
+                    setattr(
+                        sample,
+                        f"{field}_confidence",
+                        result[field].get("confidence", 0.75),
+                    )
 
     return record

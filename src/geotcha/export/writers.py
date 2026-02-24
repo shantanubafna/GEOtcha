@@ -48,6 +48,13 @@ GSE_HARMONIZED_EXTRA_FIELDS = [
     "timepoint_harmonized",
 ]
 
+GSE_PROVENANCE_FIELDS = [
+    "tissue_source", "tissue_confidence", "tissue_ontology_id",
+    "disease_source", "disease_confidence", "disease_ontology_id",
+    "treatment_source", "treatment_confidence", "treatment_ontology_id",
+    "timepoint_source", "timepoint_confidence", "timepoint_ontology_id",
+]
+
 # GSM fields for per-GSE sample files
 GSM_FIELDS = [
     "gsm_id",
@@ -82,6 +89,21 @@ GSM_HARMONIZED_EXTRA_FIELDS = [
     "timepoint_harmonized",
 ]
 
+GSM_PROVENANCE_FIELDS = [
+    "tissue_source", "tissue_confidence", "tissue_ontology_id",
+    "cell_type_source", "cell_type_confidence", "cell_type_ontology_id",
+    "disease_source", "disease_confidence", "disease_ontology_id",
+    "gender_source", "gender_confidence", "gender_ontology_id",
+    "age_source", "age_confidence", "age_ontology_id",
+    "treatment_source", "treatment_confidence", "treatment_ontology_id",
+    "timepoint_source", "timepoint_confidence", "timepoint_ontology_id",
+]
+
+REVIEW_QUEUE_FIELDS = [
+    "gsm_id", "gse_id", "field_name", "raw_value",
+    "harmonized_value", "confidence", "source",
+]
+
 
 def _get_delimiter(fmt: str) -> str:
     return "\t" if fmt == "tsv" else ","
@@ -89,6 +111,24 @@ def _get_delimiter(fmt: str) -> str:
 
 def _get_extension(fmt: str) -> str:
     return ".tsv" if fmt == "tsv" else ".csv"
+
+
+def _build_gse_fields(harmonized: bool) -> list[str]:
+    """Build the GSE field list, including provenance when harmonized."""
+    fields = GSE_FIELDS[:]
+    if harmonized:
+        fields.extend(GSE_HARMONIZED_EXTRA_FIELDS)
+        fields.extend(GSE_PROVENANCE_FIELDS)
+    return fields
+
+
+def _build_gsm_fields(harmonized: bool) -> list[str]:
+    """Build the GSM field list, including provenance when harmonized."""
+    fields = GSM_FIELDS[:]
+    if harmonized:
+        fields.extend(GSM_HARMONIZED_EXTRA_FIELDS)
+        fields.extend(GSM_PROVENANCE_FIELDS)
+    return fields
 
 
 def gse_to_row(record: GSERecord, harmonized: bool = False) -> dict:
@@ -124,6 +164,8 @@ def gse_to_row(record: GSERecord, harmonized: bool = False) -> dict:
         row["disease_harmonized"] = record.disease_harmonized or ""
         row["treatment_harmonized"] = record.treatment_harmonized or ""
         row["timepoint_harmonized"] = record.timepoint_harmonized or ""
+        for field in GSE_PROVENANCE_FIELDS:
+            row[field] = getattr(record, field, None) or ""
     return row
 
 
@@ -159,6 +201,8 @@ def _gsm_to_row(record: GSMRecord, harmonized: bool = False) -> dict:
         row["age_harmonized"] = record.age_harmonized or ""
         row["treatment_harmonized"] = record.treatment_harmonized or ""
         row["timepoint_harmonized"] = record.timepoint_harmonized or ""
+        for field in GSM_PROVENANCE_FIELDS:
+            row[field] = getattr(record, field, None) or ""
     return row
 
 
@@ -174,10 +218,7 @@ def write_gse_summary(
     filename = f"gse_summary{ext}"
     filepath = output_dir / filename
 
-    fields = GSE_FIELDS[:]
-    if harmonized:
-        fields.extend(GSE_HARMONIZED_EXTRA_FIELDS)
-
+    fields = _build_gse_fields(harmonized)
     delimiter = _get_delimiter(fmt)
 
     with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -213,10 +254,7 @@ def write_gse_summary_rows(
     ext = _get_extension(fmt)
     filepath = output_dir / f"gse_summary{ext}"
 
-    fields = GSE_FIELDS[:]
-    if harmonized:
-        fields.extend(GSE_HARMONIZED_EXTRA_FIELDS)
-
+    fields = _build_gse_fields(harmonized)
     delimiter = _get_delimiter(fmt)
     with open(filepath, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields, delimiter=delimiter, extrasaction="ignore")
@@ -240,10 +278,7 @@ def write_gsm_file(
     ext = _get_extension(fmt)
     filepath = gsm_dir / f"{gse_record.gse_id}_samples{ext}"
 
-    fields = GSM_FIELDS[:]
-    if harmonized:
-        fields.extend(GSM_HARMONIZED_EXTRA_FIELDS)
-
+    fields = _build_gsm_fields(harmonized)
     delimiter = _get_delimiter(fmt)
 
     with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -279,10 +314,7 @@ def open_gse_summary_writer(
     ext = _get_extension(fmt)
     filepath = output_dir / f"gse_summary{ext}"
 
-    fields = GSE_FIELDS[:]
-    if harmonized:
-        fields.extend(GSE_HARMONIZED_EXTRA_FIELDS)
-
+    fields = _build_gse_fields(harmonized)
     delimiter = _get_delimiter(fmt)
 
     with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -298,13 +330,78 @@ def open_gse_summary_writer(
     logger.info(f"Closed streaming GSE summary writer: {filepath}")
 
 
+def write_review_queue(
+    records: list[GSERecord],
+    output_dir: Path,
+    fmt: str = "csv",
+    confidence_threshold: float = 0.65,
+) -> Path | None:
+    """Write a review queue CSV of low-confidence harmonized fields.
+
+    Returns the file path, or None if no rows need review.
+    """
+    rows: list[dict] = []
+
+    gse_prov_fields = ["tissue", "disease", "treatment", "timepoint"]
+    gsm_prov_fields = [
+        "tissue", "cell_type", "disease", "gender", "age", "treatment", "timepoint",
+    ]
+
+    for record in records:
+        # GSE-level provenance
+        for field in gse_prov_fields:
+            confidence = getattr(record, f"{field}_confidence", None)
+            if confidence is not None and confidence < confidence_threshold:
+                rows.append({
+                    "gsm_id": "",
+                    "gse_id": record.gse_id,
+                    "field_name": field,
+                    "raw_value": getattr(record, field, "") or "",
+                    "harmonized_value": getattr(record, f"{field}_harmonized", "") or "",
+                    "confidence": confidence,
+                    "source": getattr(record, f"{field}_source", "") or "",
+                })
+
+        # GSM-level provenance
+        for sample in record.samples:
+            for field in gsm_prov_fields:
+                confidence = getattr(sample, f"{field}_confidence", None)
+                if confidence is not None and confidence < confidence_threshold:
+                    rows.append({
+                        "gsm_id": sample.gsm_id,
+                        "gse_id": sample.gse_id,
+                        "field_name": field,
+                        "raw_value": getattr(sample, field, "") or "",
+                        "harmonized_value": getattr(sample, f"{field}_harmonized", "") or "",
+                        "confidence": confidence,
+                        "source": getattr(sample, f"{field}_source", "") or "",
+                    })
+
+    if not rows:
+        return None
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ext = _get_extension(fmt)
+    filepath = output_dir / f"review_queue{ext}"
+    delimiter = _get_delimiter(fmt)
+
+    with open(filepath, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=REVIEW_QUEUE_FIELDS, delimiter=delimiter)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+    logger.info(f"Wrote review queue: {filepath} ({len(rows)} rows)")
+    return filepath
+
+
 def write_all(
     records: list[GSERecord],
     output_dir: Path,
     fmt: str = "csv",
     harmonized: bool = False,
 ) -> dict[str, Path]:
-    """Write all output files: GSE summary + per-GSE GSM files."""
+    """Write all output files: GSE summary + per-GSE GSM files + review queue."""
     paths: dict[str, Path] = {}
 
     paths["gse_summary"] = write_gse_summary(records, output_dir, fmt, harmonized)
@@ -313,5 +410,10 @@ def write_all(
         if record.samples:
             path = write_gsm_file(record, output_dir, fmt, harmonized)
             paths[record.gse_id] = path
+
+    if harmonized:
+        review_path = write_review_queue(records, output_dir, fmt)
+        if review_path:
+            paths["review_queue"] = review_path
 
     return paths

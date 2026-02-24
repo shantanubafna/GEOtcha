@@ -108,7 +108,8 @@ class TestRunManifest:
         assert len(manifests) == 1
         data = json.loads(manifests[0].read_text())
         assert data["query"] == "IBD"
-        assert data["pipeline_version"] == "0.2.0"
+        from geotcha import __version__
+        assert data["pipeline_version"] == __version__
         assert "started_at" in data
         assert "settings_snapshot" in data
 
