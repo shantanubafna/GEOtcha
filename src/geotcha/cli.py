@@ -176,6 +176,14 @@ def run(
         bool,
         typer.Option("--non-interactive", help="Disable all interactive prompts, use defaults"),
     ] = False,
+    max_workers: Annotated[
+        int | None,
+        typer.Option("--max-workers", help="Max parallel workers for extraction (default 4)"),
+    ] = None,
+    cache_ttl_days: Annotated[
+        int | None,
+        typer.Option("--cache-ttl-days", help="Entrez cache TTL in days (default 7)"),
+    ] = None,
 ) -> None:
     """Run the full pipeline: search, filter, extract, and export."""
     from geotcha.config import Settings
@@ -191,6 +199,8 @@ def run(
             include_scrna=include_scrna or None,
             yes=yes or None,
             non_interactive=non_interactive or None,
+            max_workers=max_workers,
+            cache_ttl_days=cache_ttl_days,
         )
         run_pipeline(
             query=query,

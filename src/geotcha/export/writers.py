@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import csv
 import logging
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
 from pathlib import Path
 
 from geotcha.export.formatters import format_pubmed_ids, gse_url
@@ -254,6 +256,46 @@ def write_gsm_file(
         f"Wrote GSM file: {filepath} ({len(gse_record.samples)} samples)"
     )
     return filepath
+
+
+@contextmanager
+def open_gse_summary_writer(
+    output_dir: Path,
+    fmt: str = "csv",
+    harmonized: bool = False,
+) -> Generator[Callable[[GSERecord], None], None, None]:
+    """Context manager that opens the GSE summary file and yields a row-writer callable.
+
+    The yielded callable accepts a GSERecord and immediately writes + flushes the row,
+    enabling streaming output as records complete rather than buffering all in memory.
+
+    Usage::
+
+        with open_gse_summary_writer(output_dir, fmt, harmonized) as write_row:
+            for record in records:
+                write_row(record)
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ext = _get_extension(fmt)
+    filepath = output_dir / f"gse_summary{ext}"
+
+    fields = GSE_FIELDS[:]
+    if harmonized:
+        fields.extend(GSE_HARMONIZED_EXTRA_FIELDS)
+
+    delimiter = _get_delimiter(fmt)
+
+    with open(filepath, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fields, delimiter=delimiter, extrasaction="ignore")
+        writer.writeheader()
+
+        def write_row(record: GSERecord) -> None:
+            writer.writerow(gse_to_row(record, harmonized))
+            f.flush()
+
+        yield write_row
+
+    logger.info(f"Closed streaming GSE summary writer: {filepath}")
 
 
 def write_all(

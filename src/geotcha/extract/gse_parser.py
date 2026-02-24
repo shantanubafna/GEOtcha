@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 import GEOparse
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from geotcha.config import Settings
 from geotcha.extract.fields import (
@@ -19,6 +20,19 @@ from geotcha.models import GSERecord
 logger = logging.getLogger(__name__)
 
 
+def _fetch_geo(gse_id: str, cache_dir: str, max_retries: int) -> GEOparse.GEOparse.GSE:
+    """Download and parse a GEO SOFT file with exponential-backoff retry."""
+    for attempt in Retrying(
+        stop=stop_after_attempt(max_retries),
+        wait=wait_exponential(multiplier=1, min=2, max=60),
+        retry=retry_if_exception_type((IOError, OSError, RuntimeError)),
+        reraise=True,
+    ):
+        with attempt:
+            return GEOparse.get_GEO(geo=gse_id, destdir=cache_dir, silent=True)
+    raise RuntimeError("unreachable")  # pragma: no cover
+
+
 def parse_gse(gse_id: str, settings: Settings, include_scrna: bool = False) -> GSERecord:
     """Parse a GSE entry into a structured GSERecord.
 
@@ -28,7 +42,7 @@ def parse_gse(gse_id: str, settings: Settings, include_scrna: bool = False) -> G
     cache_dir = settings.get_cache_dir()
 
     logger.info(f"Downloading/parsing SOFT file for {gse_id}")
-    gse = GEOparse.get_GEO(geo=gse_id, destdir=str(cache_dir), silent=True)
+    gse = _fetch_geo(gse_id, str(cache_dir), settings.max_retries)
 
     metadata = gse.metadata
 

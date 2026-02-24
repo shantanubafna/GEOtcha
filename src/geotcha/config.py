@@ -88,6 +88,14 @@ class Settings(BaseSettings):
     # Data directory for runs
     data_dir: Path | None = Field(default=None, description="Directory for run state files")
 
+    # Parallelism settings
+    max_workers: int = Field(default=4, description="Max parallel workers for GSE extraction")
+
+    # Entrez cache settings
+    enable_entrez_cache: bool = Field(
+        default=True, description="Cache Entrez API responses to reduce repeat network calls",
+    )
+
     # Non-interactive mode
     non_interactive: bool = Field(
         default=False, description="Disable all interactive prompts, use defaults",
@@ -110,6 +118,12 @@ class Settings(BaseSettings):
         if self.ncbi_api_key:
             return 10.0
         return 3.0
+
+    def get_effective_max_workers(self) -> int:
+        """Max parallel workers: capped at 2 without NCBI API key, 6 with."""
+        if self.ncbi_api_key:
+            return min(self.max_workers, 6)
+        return min(self.max_workers, 2)
 
     @classmethod
     def load(cls, **overrides) -> Settings:

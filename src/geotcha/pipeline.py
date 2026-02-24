@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import uuid
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -81,14 +82,27 @@ def _extract_batch(
     harmonize: bool = False,
     use_llm: bool = False,
     include_scrna: bool = False,
+    output_dir: Path | None = None,
+    fmt: str = "csv",
 ) -> tuple[list[GSERecord], list[tuple[str, str]]]:
-    """Extract metadata for a batch of GSE IDs with progress tracking.
+    """Extract metadata for a batch of GSE IDs with parallel workers and progress tracking.
+
+    Uses a ThreadPoolExecutor bounded by settings.get_effective_max_workers().
+    GSM files are written immediately as each GSE completes (when output_dir provided).
+    Records are returned in the original gse_ids order.
 
     Returns:
         Tuple of (records, failed) where failed is a list of (gse_id, error_message).
     """
-    records: list[GSERecord] = []
+    records_by_index: dict[int, GSERecord] = {}
     failed: list[tuple[str, str]] = []
+    max_workers = settings.get_effective_max_workers()
+
+    def _process_one(idx: int, gse_id: str) -> tuple[int, GSERecord]:
+        record = parse_gse(gse_id, settings, include_scrna=include_scrna)
+        if harmonize:
+            record = _harmonize_record(record, use_llm, settings)
+        return idx, record
 
     with Progress(
         SpinnerColumn(),
@@ -99,20 +113,29 @@ def _extract_batch(
     ) as progress:
         task = progress.add_task("Extracting metadata...", total=len(gse_ids))
 
-        for gse_id in gse_ids:
-            try:
-                progress.update(task, description=f"Processing {gse_id}...")
-                record = parse_gse(gse_id, settings, include_scrna=include_scrna)
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures: dict[Future[tuple[int, GSERecord]], tuple[int, str]] = {
+                executor.submit(_process_one, idx, gse_id): (idx, gse_id)
+                for idx, gse_id in enumerate(gse_ids)
+            }
 
-                if harmonize:
-                    record = _harmonize_record(record, use_llm, settings)
+            for future in as_completed(futures):
+                idx, gse_id = futures[future]
+                try:
+                    _, record = future.result()
+                    records_by_index[idx] = record
+                    # Write GSM file immediately as each GSE completes
+                    if output_dir is not None and record.samples:
+                        write_gsm_file(record, output_dir, fmt, harmonize)
+                    progress.update(task, description=f"Completed {gse_id}...")
+                except Exception as e:
+                    logger.error(f"Failed to process {gse_id}: {e}")
+                    failed.append((gse_id, str(e)))
+                finally:
+                    progress.advance(task)
 
-                records.append(record)
-            except Exception as e:
-                logger.error(f"Failed to process {gse_id}: {e}")
-                failed.append((gse_id, str(e)))
-            finally:
-                progress.advance(task)
+    # Return records in original submission order
+    records = [records_by_index[i] for i in sorted(records_by_index)]
 
     if failed:
         console.print(f"\n[yellow]Warning: {len(failed)} datasets failed:[/yellow]")
@@ -285,6 +308,8 @@ def run_pipeline(
         records, failed = _extract_batch(
             subset_ids, settings, console, harmonize, use_llm,
             include_scrna=settings.include_scrna,
+            output_dir=output_dir,
+            fmt=settings.output_format,
         )
         all_failed.extend(failed)
 
@@ -322,6 +347,8 @@ def run_pipeline(
             more_records, more_failed = _extract_batch(
                 remaining_ids, settings, console, harmonize, use_llm,
                 include_scrna=settings.include_scrna,
+                output_dir=output_dir,
+                fmt=settings.output_format,
             )
             all_failed.extend(more_failed)
             records.extend(more_records)
@@ -341,6 +368,8 @@ def run_pipeline(
         records, failed = _extract_batch(
             filtered_ids, settings, console, harmonize, use_llm,
             include_scrna=settings.include_scrna,
+            output_dir=output_dir,
+            fmt=settings.output_format,
         )
         all_failed.extend(failed)
         paths = write_all(records, output_dir, settings.output_format, harmonize)
@@ -375,6 +404,8 @@ def run_extract(
     records, _failed = _extract_batch(
         gse_ids, settings, console, harmonize,
         include_scrna=settings.include_scrna,
+        output_dir=output_dir,
+        fmt=settings.output_format,
     )
 
     write_all(records, output_dir, settings.output_format, harmonize)
