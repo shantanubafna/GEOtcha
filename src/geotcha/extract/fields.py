@@ -362,6 +362,38 @@ def extract_disease_from_characteristics(chars: dict[str, str]) -> str | None:
     return None
 
 
+DISEASE_STATUS_VOCAB: dict[str, str] = {
+    "healthy": "healthy",
+    "normal": "healthy",
+    "control": "healthy",
+    "diseased": "diseased",
+    "disease": "diseased",
+    "affected": "diseased",
+    "active": "active",
+    "inactive": "inactive",
+    "remission": "remission",
+    "flare": "flare",
+}
+
+
+def extract_disease_status_from_characteristics(
+    chars: dict[str, str],
+) -> tuple[str | None, float]:
+    """Extract disease status from characteristics with confidence score.
+
+    Returns (status, confidence). Vocab match -> 1.0, raw value -> 0.70.
+    """
+    status_keys = ["disease state", "disease status", "condition"]
+    for key in status_keys:
+        if key in chars:
+            val = chars[key].strip().lower()
+            mapped = DISEASE_STATUS_VOCAB.get(val)
+            if mapped:
+                return (mapped, 1.0)
+            return (chars[key].strip(), 0.70)
+    return (None, 0.0)
+
+
 def aggregate_sample_field(samples: list, field: str) -> str | None:
     """Aggregate a field across samples into a summary string.
 

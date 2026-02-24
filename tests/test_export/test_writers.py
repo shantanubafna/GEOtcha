@@ -8,8 +8,10 @@ from geotcha.export.writers import (
     write_all,
     write_gse_summary,
     write_gsm_file,
+    write_review_queue,
 )
-from geotcha.models import GSERecord
+from geotcha.harmonize.rules import harmonize_gse, harmonize_gsm
+from geotcha.models import GSERecord, GSMRecord
 
 
 class TestWriteGSESummary:
@@ -101,3 +103,104 @@ class TestOpenGSESummaryWriter:
             rows = list(csv.DictReader(f))
         assert "tissue_harmonized" in rows[0]
         assert rows[0]["tissue_harmonized"] == "colon"
+
+
+class TestProvenanceColumns:
+    def test_provenance_present_when_harmonized(self, sample_gse: GSERecord, tmp_output: Path):
+        harmonize_gse(sample_gse)
+        for s in sample_gse.samples:
+            harmonize_gsm(s)
+        path = write_gse_summary([sample_gse], tmp_output, harmonized=True)
+        with open(path) as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        assert "tissue_source" in rows[0]
+        assert "tissue_confidence" in rows[0]
+        assert "tissue_ontology_id" in rows[0]
+
+    def test_provenance_absent_when_not_harmonized(
+        self, sample_gse: GSERecord, tmp_output: Path,
+    ):
+        path = write_gse_summary([sample_gse], tmp_output, harmonized=False)
+        with open(path) as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        assert "tissue_source" not in rows[0]
+        assert "tissue_confidence" not in rows[0]
+
+    def test_gsm_provenance_present(self, sample_gse: GSERecord, tmp_output: Path):
+        for s in sample_gse.samples:
+            harmonize_gsm(s)
+        path = write_gsm_file(sample_gse, tmp_output, harmonized=True)
+        with open(path) as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        assert "tissue_source" in rows[0]
+        assert "disease_confidence" in rows[0]
+
+    def test_gsm_provenance_absent(self, sample_gse: GSERecord, tmp_output: Path):
+        path = write_gsm_file(sample_gse, tmp_output, harmonized=False)
+        with open(path) as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        assert "tissue_source" not in rows[0]
+
+
+class TestReviewQueue:
+    def _make_low_confidence_gse(self, sample_gsm: GSMRecord) -> GSERecord:
+        """Create a GSERecord with low-confidence fields for review queue testing."""
+        gsm = sample_gsm.model_copy()
+        harmonize_gsm(gsm)
+        # Force a low-confidence field
+        gsm.tissue_harmonized = "some tissue"
+        gsm.tissue_source = "raw_fallback"
+        gsm.tissue_confidence = 0.50
+        gsm.tissue_ontology_id = None
+
+        gse = GSERecord(
+            gse_id="GSE99999",
+            title="Test",
+            organism=["Homo sapiens"],
+            total_samples=1,
+            samples=[gsm],
+            tissue="unknown tissue",
+        )
+        harmonize_gse(gse)
+        return gse
+
+    def test_low_confidence_flagged(self, sample_gsm: GSMRecord, tmp_output: Path):
+        gse = self._make_low_confidence_gse(sample_gsm)
+        path = write_review_queue([gse], tmp_output)
+        assert path is not None
+        assert path.exists()
+        with open(path) as f:
+            rows = list(csv.DictReader(f))
+        # Should have at least one low-confidence row
+        assert len(rows) > 0
+        field_names = [r["field_name"] for r in rows]
+        assert "tissue" in field_names
+
+    def test_high_confidence_skipped(self, sample_gse: GSERecord, tmp_output: Path):
+        harmonize_gse(sample_gse)
+        for s in sample_gse.samples:
+            harmonize_gsm(s)
+        # All fields are exact matches → confidence >= 0.70
+        # Only treatment has 0.70 which is >= 0.65 threshold
+        # So nothing should be flagged (all >= 0.65)
+        path = write_review_queue([sample_gse], tmp_output, confidence_threshold=0.65)
+        # All standard test data has confidence >= 0.70
+        assert path is None
+
+    def test_write_all_includes_review_queue(
+        self, sample_gsm: GSMRecord, tmp_output: Path,
+    ):
+        gse = self._make_low_confidence_gse(sample_gsm)
+        paths = write_all([gse], tmp_output, harmonized=True)
+        assert "review_queue" in paths
+        assert paths["review_queue"].exists()
+
+    def test_write_all_no_review_queue_when_not_harmonized(
+        self, sample_gse: GSERecord, tmp_output: Path,
+    ):
+        paths = write_all([sample_gse], tmp_output, harmonized=False)
+        assert "review_queue" not in paths

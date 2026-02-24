@@ -40,6 +40,9 @@ TISSUE_ONTOLOGY: dict[str, tuple[str, str]] = {
     "jejunum": ("jejunum", "UBERON:0002115"),
     "cecum": ("cecum", "UBERON:0001153"),
     "sigmoid colon": ("sigmoid colon", "UBERON:0001159"),
+    "transverse colon": ("transverse colon", "UBERON:0001157"),
+    "ascending colon": ("ascending colon", "UBERON:0001156"),
+    "descending colon": ("descending colon", "UBERON:0001158"),
     "biopsy": ("biopsy", ""),
     "synovial tissue": ("synovial membrane", "UBERON:0000042"),
     "synovium": ("synovial membrane", "UBERON:0000042"),
@@ -85,6 +88,23 @@ DISEASE_ONTOLOGY: dict[str, tuple[str, str]] = {
 }
 
 
+TISSUE_SYNONYMS: dict[str, str] = {
+    "gut": "intestine",
+    "bowel": "intestine",
+    "gi tract": "intestine",
+    "gastrointestinal": "intestine",
+    "whole blood": "blood",
+    "colonic tissue": "colon",
+}
+
+DISEASE_SYNONYMS: dict[str, str] = {
+    "crohns": "crohn's disease",
+    "crohns disease": "crohn's disease",
+    "uc disease": "ulcerative colitis",
+    "lupus nephritis": "systemic lupus erythematosus",
+}
+
+
 def lookup_tissue(raw: str) -> tuple[str, str] | None:
     """Look up standardized tissue name and UBERON ID."""
     return TISSUE_ONTOLOGY.get(raw.lower().strip())
@@ -93,3 +113,62 @@ def lookup_tissue(raw: str) -> tuple[str, str] | None:
 def lookup_disease(raw: str) -> tuple[str, str] | None:
     """Look up standardized disease name and ontology ID."""
     return DISEASE_ONTOLOGY.get(raw.lower().strip())
+
+
+def _substring_match(ontology_key: str, text: str) -> bool:
+    """Check if an ontology key appears as a meaningful substring in text.
+
+    Short keys (<=3 chars) are skipped to avoid false positives
+    (e.g., "ra" matching "rare", "uc" matching "sauce").
+    """
+    if len(ontology_key) <= 3:
+        return False
+    return ontology_key in text
+
+
+def lookup_tissue_with_confidence(raw: str) -> tuple[str, str, float] | None:
+    """Look up tissue with confidence tier.
+
+    Returns (standardized_name, ontology_id, confidence) or None.
+    Tiers: exact=1.0, synonym=0.85, substring heuristic=0.70.
+    """
+    key = raw.lower().strip()
+    # Tier 1: exact match
+    result = TISSUE_ONTOLOGY.get(key)
+    if result:
+        return (result[0], result[1], 1.0)
+    # Tier 2: synonym match
+    canonical = TISSUE_SYNONYMS.get(key)
+    if canonical:
+        result = TISSUE_ONTOLOGY.get(canonical)
+        if result:
+            return (result[0], result[1], 0.85)
+    # Tier 3: substring heuristic (ontology key found in raw)
+    for ontology_key, (name, ont_id) in TISSUE_ONTOLOGY.items():
+        if _substring_match(ontology_key, key):
+            return (name, ont_id, 0.70)
+    return None
+
+
+def lookup_disease_with_confidence(raw: str) -> tuple[str, str, float] | None:
+    """Look up disease with confidence tier.
+
+    Returns (standardized_name, ontology_id, confidence) or None.
+    Tiers: exact=1.0, synonym=0.85, substring heuristic=0.70.
+    """
+    key = raw.lower().strip()
+    # Tier 1: exact match
+    result = DISEASE_ONTOLOGY.get(key)
+    if result:
+        return (result[0], result[1], 1.0)
+    # Tier 2: synonym match
+    canonical = DISEASE_SYNONYMS.get(key)
+    if canonical:
+        result = DISEASE_ONTOLOGY.get(canonical)
+        if result:
+            return (result[0], result[1], 0.85)
+    # Tier 3: substring heuristic (ontology key found in raw)
+    for ontology_key, (name, ont_id) in DISEASE_ONTOLOGY.items():
+        if _substring_match(ontology_key, key):
+            return (name, ont_id, 0.70)
+    return None

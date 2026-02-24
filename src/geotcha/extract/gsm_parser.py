@@ -15,6 +15,7 @@ from geotcha.extract.fields import (
     extract_cell_type_from_characteristics,
     extract_clinical_severity_from_characteristics,
     extract_disease_from_characteristics,
+    extract_disease_status_from_characteristics,
     extract_gender_from_characteristics,
     extract_responder_from_characteristics,
     extract_sample_acquisition_from_characteristics,
@@ -86,10 +87,7 @@ def parse_gsm_samples(
         cell_type = extract_cell_type_from_characteristics(characteristics)
 
         # Disease status
-        disease_status = characteristics.get(
-            "disease state",
-            characteristics.get("disease status", characteristics.get("condition")),
-        )
+        disease_status, _ = extract_disease_status_from_characteristics(characteristics)
 
         # Sample acquisition: try characteristics, then text
         sample_acq = extract_sample_acquisition_from_characteristics(characteristics)
@@ -142,9 +140,27 @@ def parse_gsm_samples(
 
 
 def _is_single_cell_sample(record: GSMRecord) -> bool:
-    """Check if a GSM sample is single-cell based on library_source."""
+    """Check if a GSM sample is single-cell based on metadata fields.
+
+    Checks library_source, library_strategy, title, description,
+    and characteristics values using SCRNA_PATTERNS regex.
+    """
+    from geotcha.search.filters import SCRNA_PATTERNS
+
     library_source = (record.library_source or "").lower()
-    return "single cell" in library_source
+    if "single cell" in library_source:
+        return True
+    library_strategy = (record.library_strategy or "").lower()
+    if "single cell" in library_strategy or "scrna" in library_strategy:
+        return True
+    text = " ".join([
+        record.title or "",
+        record.description or "",
+        *record.characteristics.values(),
+    ])
+    if SCRNA_PATTERNS.search(text):
+        return True
+    return False
 
 
 def _filter_human_rnaseq(
