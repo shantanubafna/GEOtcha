@@ -88,6 +88,14 @@ class Settings(BaseSettings):
     # Data directory for runs
     data_dir: Path | None = Field(default=None, description="Directory for run state files")
 
+    # Non-interactive mode
+    non_interactive: bool = Field(
+        default=False, description="Disable all interactive prompts, use defaults",
+    )
+    yes: bool = Field(
+        default=False, description="Auto-confirm all prompts (equivalent to non-interactive)",
+    )
+
     def get_cache_dir(self) -> Path:
         d = self.cache_dir or _geotcha_cache_dir() / "soft_files"
         d.mkdir(parents=True, exist_ok=True)

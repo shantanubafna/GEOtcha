@@ -168,6 +168,14 @@ def run(
         bool,
         typer.Option("--include-scrna", help="Include single-cell RNA-seq datasets"),
     ] = False,
+    yes: Annotated[
+        bool,
+        typer.Option("--yes", "-y", help="Auto-confirm all prompts (non-interactive)"),
+    ] = False,
+    non_interactive: Annotated[
+        bool,
+        typer.Option("--non-interactive", help="Disable all interactive prompts, use defaults"),
+    ] = False,
 ) -> None:
     """Run the full pipeline: search, filter, extract, and export."""
     from geotcha.config import Settings
@@ -181,6 +189,8 @@ def run(
             output_dir=output,
             llm_provider=llm_provider,
             include_scrna=include_scrna or None,
+            yes=yes or None,
+            non_interactive=non_interactive or None,
         )
         run_pipeline(
             query=query,

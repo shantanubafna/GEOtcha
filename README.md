@@ -56,6 +56,13 @@ pip install geotcha[llm]
 geotcha run "IBD" --harmonize --llm --llm-provider anthropic
 ```
 
+### CI / non-interactive mode
+
+```bash
+geotcha run "IBD" --non-interactive --output ./results/
+geotcha run "IBD" --yes --subset 10 --harmonize
+```
+
 ## Configuration
 
 ```bash
@@ -76,6 +83,7 @@ Configuration priority: CLI flags > environment variables (`GEOTCHA_*`) > config
 GEOtcha produces:
 - **`gse_summary.csv`** — One row per GSE with series-level metadata
 - **`gsm/<GSE_ID>_samples.csv`** — Per-GSE file with sample-level metadata
+- **`manifest.json`** (in run state dir) — Audit trail: run_id, query, timestamps, counts, masked settings
 - With `--harmonize`: additional `_harmonized` columns with standardized values
 
 ### Fields extracted
@@ -102,6 +110,12 @@ Results: ./output/gse_summary.csv (5 rows), ./output/gsm/ (5 files)
 
 Proceed with remaining 177 datasets? [Y/n]:
 ```
+
+Use `--yes` or `--non-interactive` to skip all prompts (useful for CI and scripted workflows).
+
+## Resume
+
+Interrupted runs can be resumed with `geotcha resume <run_id>`. Resume correctly merges previously extracted rows in `gse_summary.csv` with newly extracted records, deduplicating by `gse_id`.
 
 ## Disease Expansion
 
