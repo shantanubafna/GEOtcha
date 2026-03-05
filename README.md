@@ -15,6 +15,12 @@ GEOtcha is a CLI tool that helps researchers search GEO by disease keyword, filt
 pip install geotcha
 ```
 
+With optional ML harmonization (GLiNER + SapBERT):
+
+```bash
+pip install geotcha[ml]
+```
+
 For development:
 
 ```bash
@@ -49,6 +55,15 @@ geotcha extract GSE12345 GSE67890 --output ./results/
 geotcha run "IBD" --subset 5 --include-scrna
 ```
 
+### With ML harmonization (zero-shot NER)
+
+```bash
+pip install geotcha[ml]
+geotcha run "IBD" --harmonize --ml-mode hybrid
+```
+
+ML fills in missing or low-confidence fields using GLiNER biomedical NER. Use `--ml-mode full` to let ML run on all fields.
+
 ### With LLM harmonization
 
 ```bash
@@ -56,11 +71,32 @@ pip install geotcha[llm]
 geotcha run "IBD" --harmonize --llm --llm-provider anthropic
 ```
 
+### Combined: rules + ML + LLM
+
+```bash
+pip install "geotcha[ml,llm]"
+geotcha run "IBD" --harmonize --ml-mode hybrid --llm
+```
+
+The harmonization chain runs in order: **rules → ML → LLM**. Each layer only upgrades fields that are still missing or low-confidence.
+
 ### CI / non-interactive mode
 
 ```bash
 geotcha run "IBD" --non-interactive --output ./results/
 geotcha run "IBD" --yes --subset 10 --harmonize
+```
+
+## Python SDK
+
+```python
+from geotcha.api import GEOtchaClient
+
+client = GEOtchaClient(ncbi_api_key="...")
+ids = client.search("ulcerative colitis")
+records = client.extract(ids[:5])
+records = client.harmonize(records, ml_mode="hybrid")
+client.export(records, output_dir="./results")
 ```
 
 ## Configuration
@@ -74,6 +110,9 @@ geotcha config set ncbi_email "you@example.com"
 
 # View current configuration
 geotcha config show
+
+# Validate configuration
+geotcha config validate
 ```
 
 Configuration priority: CLI flags > environment variables (`GEOTCHA_*`) > config file (`~/.config/geotcha/config.toml`) > defaults.
@@ -147,14 +186,26 @@ geotcha config set include_scrna true
 
 ## Harmonization
 
-Rule-based normalization for:
+Three-tier harmonization pipeline (each layer is optional):
+
+### 1. Rules (always on with `--harmonize`)
 - **Gender**: male/M/man → "male"
 - **Age**: "45 years", "45yo" → "45"
 - **Tissue**: mapped to UBERON ontology terms
 - **Disease**: mapped to Disease Ontology terms
 - **Timepoint**: "week 8", "W8" → "W8"
 
-Optional LLM-assisted harmonization (`--llm`) for ambiguous free-text values.
+### 2. ML (`--ml-mode hybrid` or `--ml-mode full`)
+- **GLiNER-BioMed**: zero-shot biomedical NER for disease, tissue, cell type, treatment, gender
+- **SapBERT**: entity linking to UBERON/DOID ontology terms (scaffold — index building deferred)
+- In `hybrid` mode, ML only fills fields where rules produced low confidence or no value
+- Low-confidence ML predictions flag records with `needs_review=True`
+
+### 3. LLM (`--llm`)
+- Optional LLM-assisted harmonization for ambiguous free-text values
+- Supports OpenAI, Anthropic, and Ollama providers
+
+Each field tracks provenance: `_harmonized`, `_source` (rule/ml/llm), `_confidence`, and `_ontology_id`.
 
 ## License
 
