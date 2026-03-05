@@ -102,6 +102,21 @@ geotcha extract GSE12345 --log-json
 
 Emits structured JSON log lines to stderr — useful for log aggregation in production pipelines.
 
+### Benchmark harmonization quality
+
+```bash
+# Run against bundled fixtures (20 curated datasets)
+geotcha benchmark
+
+# Custom fixtures and output
+geotcha benchmark --input ./my_fixtures/ --output ./report.json
+
+# Benchmark with ML enabled
+geotcha benchmark --ml-mode hybrid
+```
+
+Produces a JSON report with per-field exact match, completeness, ontology coverage, and confidence metrics.
+
 ### Run report
 
 ```bash
@@ -131,6 +146,10 @@ ids = client.search("ulcerative colitis")
 records = client.extract(ids[:5])
 records = client.harmonize(records, ml_mode="hybrid")
 client.export(records, output_dir="./results", fmt="parquet")
+
+# Benchmark harmonization quality
+report = client.benchmark()
+print(report["summary"]["overall_exact_match"])
 ```
 
 The SDK has no Typer/Rich dependency — safe for notebooks, scripts, and downstream pipelines. Failed GSE parses are silently skipped.
@@ -228,9 +247,13 @@ Three-tier harmonization pipeline (each layer is optional):
 ### 1. Rules (always on with `--harmonize`)
 - **Gender**: male/M/man → "male"
 - **Age**: "45 years", "45yo" → "45"
-- **Tissue**: mapped to UBERON ontology terms
-- **Disease**: mapped to Disease Ontology terms
+- **Tissue**: mapped to UBERON ontology terms with synonym resolution
+- **Disease**: mapped to Disease Ontology (DOID) terms with synonym resolution
+- **Cell type**: mapped to Cell Ontology (CL) terms with synonym resolution
+- **Treatment**: drug/biologic name recognition with brand name synonyms (e.g., Remicade → infliximab)
 - **Timepoint**: "week 8", "W8" → "W8"
+
+Ontology mappings are shipped as JSON package data (`src/geotcha/data/ontology/`) — easy to extend without touching Python code.
 
 ### 2. ML (`--ml-mode hybrid` or `--ml-mode full`)
 - **GLiNER-BioMed**: zero-shot biomedical NER for disease, tissue, cell type, treatment, gender
