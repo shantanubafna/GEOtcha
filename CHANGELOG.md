@@ -2,7 +2,7 @@
 
 All notable changes to GEOtcha are documented here.
 
-## [0.6.0] – 2026-03-05
+## [0.6.1] – 2026-03-05
 
 ### Added
 - **ML harmonization scaffold**: new `src/geotcha/ml/` module with `MLHarmonizer`, GLiNER NER, and SapBERT entity linking (all lazy-imported).
