@@ -11,7 +11,6 @@ from geotcha.pipeline import (
     _harmonize_record,
     _load_state,
     _save_state,
-    run_extract,
     run_pipeline,
 )
 
