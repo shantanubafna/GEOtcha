@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -21,6 +24,29 @@ config_app = typer.Typer(help="Manage GEOtcha configuration.")
 app.add_typer(config_app, name="config")
 
 
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+class _JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        return json.dumps({
+            "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
+            "level": record.levelname,
+            "logger": record.name,
+            "msg": record.getMessage(),
+        })
+
+
+def _configure_json_logging() -> None:
+    """Replace the root logger's handlers with a structured JSON handler."""
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(_JsonFormatter())
+    logging.root.setLevel(logging.INFO)
+    logging.root.handlers = [handler]
+
+
 def version_callback(value: bool) -> None:
     if value:
         console.print(f"GEOtcha v{__version__}")
@@ -35,6 +61,11 @@ def main(
     ] = None,
 ) -> None:
     """GEOtcha: Extract and harmonize RNA-seq metadata from NCBI GEO."""
+
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
 
 
 @app.command()
@@ -113,6 +144,14 @@ def extract(
         bool,
         typer.Option("--include-scrna", help="Include single-cell RNA-seq datasets"),
     ] = False,
+    fmt: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Output format: csv, tsv, or parquet"),
+    ] = "csv",
+    log_json: Annotated[
+        bool,
+        typer.Option("--log-json", help="Emit structured JSON logs to stderr"),
+    ] = False,
     ml_mode: Annotated[
         str,
         typer.Option("--ml-mode", help="ML harmonization: off, hybrid, or full"),
@@ -135,6 +174,10 @@ def extract(
     from geotcha.exceptions import GEOtchaError
     from geotcha.pipeline import run_extract
 
+    if fmt not in ("csv", "tsv", "parquet"):
+        console.print(f"[red]Error: --format must be one of: csv, tsv, parquet (got '{fmt}')[/red]")
+        raise typer.Exit(1)
+
     if ml_mode not in ("off", "hybrid", "full"):
         console.print(f"[red]Invalid --ml-mode: {ml_mode}. Must be off, hybrid, or full.[/red]")
         raise typer.Exit(1)
@@ -143,12 +186,15 @@ def extract(
         settings = Settings.load(
             ncbi_api_key=api_key, output_dir=output,
             include_scrna=include_scrna or None,
+            log_json=log_json or None,
             ml_mode=ml_mode if ml_mode != "off" else None,
             ml_device=ml_device if ml_device != "auto" else None,
             ml_batch_size=ml_batch_size if ml_batch_size != 32 else None,
             ml_threshold=ml_threshold if ml_threshold != 0.65 else None,
         )
-        run_extract(gse_ids, settings, harmonize=harmonize, console=console)
+        if settings.log_json or log_json:
+            _configure_json_logging()
+        run_extract(gse_ids, settings, harmonize=harmonize, console=console, fmt=fmt)
     except GEOtchaError as e:
         console.print(f"[red]Error: {e}[/red]")
         raise typer.Exit(1)
@@ -208,6 +254,14 @@ def run(
         int | None,
         typer.Option("--cache-ttl-days", help="Entrez cache TTL in days (default 7)"),
     ] = None,
+    fmt: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Output format: csv, tsv, or parquet"),
+    ] = "csv",
+    log_json: Annotated[
+        bool,
+        typer.Option("--log-json", help="Emit structured JSON logs to stderr"),
+    ] = False,
     ml_mode: Annotated[
         str,
         typer.Option("--ml-mode", help="ML harmonization: off, hybrid, or full"),
@@ -230,6 +284,10 @@ def run(
     from geotcha.exceptions import GEOtchaError
     from geotcha.pipeline import run_pipeline
 
+    if fmt not in ("csv", "tsv", "parquet"):
+        console.print(f"[red]Error: --format must be one of: csv, tsv, parquet (got '{fmt}')[/red]")
+        raise typer.Exit(1)
+
     if ml_mode not in ("off", "hybrid", "full"):
         console.print(f"[red]Invalid --ml-mode: {ml_mode}. Must be off, hybrid, or full.[/red]")
         raise typer.Exit(1)
@@ -245,11 +303,14 @@ def run(
             non_interactive=non_interactive or None,
             max_workers=max_workers,
             cache_ttl_days=cache_ttl_days,
+            log_json=log_json or None,
             ml_mode=ml_mode if ml_mode != "off" else None,
             ml_device=ml_device if ml_device != "auto" else None,
             ml_batch_size=ml_batch_size if ml_batch_size != 32 else None,
             ml_threshold=ml_threshold if ml_threshold != 0.65 else None,
         )
+        if settings.log_json or log_json:
+            _configure_json_logging()
         run_pipeline(
             query=query,
             settings=settings,
@@ -257,6 +318,7 @@ def run(
             harmonize=harmonize,
             use_llm=llm,
             console=console,
+            fmt=fmt,
         )
     except GEOtchaError as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -284,6 +346,74 @@ def resume(
     except Exception as e:
         console.print(f"[red]Unexpected error: {e}[/red]")
         raise typer.Exit(1)
+
+
+@app.command()
+def report(
+    run_id: Annotated[str, typer.Argument(help="Run ID to report on")],
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Directory to write report.json"),
+    ] = None,
+) -> None:
+    """Print a markdown summary of a completed run."""
+    from geotcha.config import Settings
+
+    settings = Settings.load()
+    manifest_path = settings.get_data_dir() / run_id / "manifest.json"
+
+    if not manifest_path.exists():
+        console.print(f"[red]Run not found: {run_id}[/red]")
+        console.print(
+            f"[dim]Expected manifest at: {manifest_path}[/dim]"
+        )
+        raise typer.Exit(1)
+
+    manifest = json.loads(manifest_path.read_text())
+
+    failed_ids = manifest.get("failed_ids", [])
+    stage_timings = manifest.get("stage_timings", {})
+
+    console.print(f"\n## Run: {run_id}")
+    console.print(f"Query:     {manifest.get('query', '')}")
+    console.print(f"Started:   {manifest.get('started_at', '')}")
+    console.print(f"Completed: {manifest.get('completed_at', 'incomplete')}")
+    console.print(
+        f"IDs found / filtered / processed: "
+        f"{manifest.get('total_ids', 0)} / "
+        f"{manifest.get('filtered_ids', 0)} / "
+        f"{manifest.get('processed_ids', 0)}"
+    )
+    console.print(
+        f"Failed: {len(failed_ids)} — {', '.join(failed_ids) if failed_ids else 'none'}"
+    )
+    if stage_timings:
+        timing_str = ", ".join(f"{k}: {v}s" for k, v in stage_timings.items())
+        console.print(f"Stage timings: {timing_str}")
+
+    report_data = {
+        "run_id": run_id,
+        "query": manifest.get("query", ""),
+        "started_at": manifest.get("started_at", ""),
+        "completed_at": manifest.get("completed_at"),
+        "total_ids": manifest.get("total_ids", 0),
+        "filtered_ids": manifest.get("filtered_ids", 0),
+        "processed_ids": manifest.get("processed_ids", 0),
+        "failed_ids": failed_ids,
+        "stage_timings": stage_timings,
+        "output_paths": manifest.get("output_paths", {}),
+    }
+
+    report_dir = output or manifest_path.parent
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = report_dir / "report.json"
+    report_path.write_text(json.dumps(report_data, indent=2))
+    console.print(f"\n[green]Report written: {report_path}[/green]")
+
+
+# ---------------------------------------------------------------------------
+# Config subcommands
+# ---------------------------------------------------------------------------
 
 
 @config_app.command("set")
@@ -321,7 +451,22 @@ def config_validate() -> None:
 
     settings = Settings.load()
     warnings = []
+    has_error = False
 
+    # Show settings with masked keys
+    console.print("[bold]Current settings:[/bold]")
+    console.print()
+    for field_name, field_info in settings.model_fields.items():
+        value = getattr(settings, field_name)
+        if "api_key" in field_name and isinstance(value, str) and value:
+            display_value = "****"
+        else:
+            display_value = str(value)
+        desc = field_info.description or ""
+        console.print(f"  [bold]{field_name}[/bold] = {display_value}  [dim]# {desc}[/dim]")
+    console.print()
+
+    # ML validation
     if settings.ml_mode not in ("off", "hybrid", "full"):
         warnings.append(
             f"ml_mode={settings.ml_mode!r} is invalid. Must be off, hybrid, or full."
@@ -342,8 +487,30 @@ def config_validate() -> None:
             f"ml_device={settings.ml_device!r} is invalid. Must be auto, cpu, cuda, or mps."
         )
 
+    # NCBI warnings
+    if settings.ncbi_email is None:
+        warnings.append(
+            "ncbi_email is not set. NCBI requires an email for API usage."
+        )
+
+    if settings.ncbi_api_key is None:
+        warnings.append(
+            "ncbi_api_key is not set. Without an API key rate limit is 3 req/s."
+        )
+
+    # Output format validation
+    if settings.output_format not in ("csv", "tsv", "parquet"):
+        console.print(
+            f"[red]Error: output_format '{settings.output_format}' is invalid. "
+            "Must be one of: csv, tsv, parquet.[/red]"
+        )
+        has_error = True
+
     if warnings:
         for w in warnings:
             console.print(f"[yellow]Warning: {w}[/yellow]")
+
+    if has_error:
+        raise typer.Exit(1)
     else:
-        console.print("[green]Configuration is valid.[/green]")
+        console.print("[green]Configuration looks valid.[/green]")

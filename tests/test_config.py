@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
+from typer.testing import CliRunner
+
+from geotcha.cli import app
 from geotcha.config import Settings, save_config
+
+runner = CliRunner()
 
 
 class TestSettingsDefaults:
@@ -107,3 +112,77 @@ class TestGetDataDir:
         d = settings.get_cache_dir()
         assert d == tmp_path / "mycache"
         assert d.exists()
+
+
+class TestLogJsonField:
+    def test_default_log_json_false(self):
+        settings = Settings()
+        assert settings.log_json is False
+
+    def test_log_json_can_be_set(self):
+        settings = Settings(log_json=True)
+        assert settings.log_json is True
+
+
+class TestConfigValidate:
+    def test_warns_missing_email(self, tmp_path):
+        settings = Settings(
+            ncbi_email=None,
+            ncbi_api_key="somekey",
+            output_dir=tmp_path / "output",
+        )
+        with patch("geotcha.config.Settings.load", return_value=settings):
+            result = runner.invoke(app, ["config", "validate"])
+
+        assert result.exit_code == 0
+        assert "ncbi_email" in result.output
+        assert "email" in result.output.lower()
+
+    def test_warns_missing_api_key(self, tmp_path):
+        settings = Settings(
+            ncbi_email="test@example.com",
+            ncbi_api_key=None,
+            output_dir=tmp_path / "output",
+        )
+        with patch("geotcha.config.Settings.load", return_value=settings):
+            result = runner.invoke(app, ["config", "validate"])
+
+        assert result.exit_code == 0
+        assert "rate limit" in result.output.lower() or "api key" in result.output.lower()
+
+    def test_valid_config_no_warnings(self, tmp_path):
+        settings = Settings(
+            ncbi_email="user@example.com",
+            ncbi_api_key="mykey12345",
+            output_dir=tmp_path / "output",
+            output_format="csv",
+        )
+        with patch("geotcha.config.Settings.load", return_value=settings):
+            result = runner.invoke(app, ["config", "validate"])
+
+        assert result.exit_code == 0
+        assert "valid" in result.output.lower()
+
+    def test_invalid_output_format_exits_with_error(self, tmp_path):
+        settings = Settings(
+            ncbi_email="user@example.com",
+            ncbi_api_key="mykey12345",
+            output_dir=tmp_path / "output",
+            output_format="xml",
+        )
+        with patch("geotcha.config.Settings.load", return_value=settings):
+            result = runner.invoke(app, ["config", "validate"])
+
+        assert result.exit_code == 1
+        assert "xml" in result.output or "invalid" in result.output.lower()
+
+    def test_api_key_masked_in_output(self, tmp_path):
+        settings = Settings(
+            ncbi_api_key="supersecretkey",
+            output_dir=tmp_path / "output",
+        )
+        with patch("geotcha.config.Settings.load", return_value=settings):
+            result = runner.invoke(app, ["config", "validate"])
+
+        assert "supersecretkey" not in result.output
+        assert "****" in result.output

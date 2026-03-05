@@ -15,10 +15,12 @@ GEOtcha is a CLI tool that helps researchers search GEO by disease keyword, filt
 pip install geotcha
 ```
 
-With optional ML harmonization (GLiNER + SapBERT):
+With optional extras:
 
 ```bash
-pip install geotcha[ml]
+pip install geotcha[ml]       # ML harmonization (GLiNER + SapBERT)
+pip install geotcha[parquet]  # Parquet export support
+pip install geotcha[llm]      # LLM harmonization
 ```
 
 For development:
@@ -48,6 +50,17 @@ geotcha run "IBD" --subset 5 --output ./results/ --harmonize
 ```bash
 geotcha extract GSE12345 GSE67890 --output ./results/
 ```
+
+### Output format selection
+
+```bash
+# CSV (default), TSV, or Parquet
+geotcha run "IBD" --harmonize --format csv
+geotcha extract GSE12345 -f tsv
+geotcha run "IBD" -f parquet --output ./results/
+```
+
+Parquet requires `pip install geotcha[parquet]`.
 
 ### Include single-cell RNA-seq datasets (excluded by default)
 
@@ -80,6 +93,27 @@ geotcha run "IBD" --harmonize --ml-mode hybrid --llm
 
 The harmonization chain runs in order: **rules → ML → LLM**. Each layer only upgrades fields that are still missing or low-confidence.
 
+### Structured JSON logging
+
+```bash
+geotcha run "IBD" --log-json --output ./results/
+geotcha extract GSE12345 --log-json
+```
+
+Emits structured JSON log lines to stderr — useful for log aggregation in production pipelines.
+
+### Run report
+
+```bash
+# After a pipeline run completes, view a summary:
+geotcha report <run_id>
+
+# Write report.json to a custom directory:
+geotcha report <run_id> --output ./reports/
+```
+
+Prints run metadata (query, ID counts, failures, stage timings) and writes a `report.json` file.
+
 ### CI / non-interactive mode
 
 ```bash
@@ -90,14 +124,16 @@ geotcha run "IBD" --yes --subset 10 --harmonize
 ## Python SDK
 
 ```python
-from geotcha.api import GEOtchaClient
+from geotcha import GEOtchaClient
 
 client = GEOtchaClient(ncbi_api_key="...")
 ids = client.search("ulcerative colitis")
 records = client.extract(ids[:5])
 records = client.harmonize(records, ml_mode="hybrid")
-client.export(records, output_dir="./results")
+client.export(records, output_dir="./results", fmt="parquet")
 ```
+
+The SDK has no Typer/Rich dependency — safe for notebooks, scripts, and downstream pipelines. Failed GSE parses are silently skipped.
 
 ## Configuration
 
@@ -120,10 +156,11 @@ Configuration priority: CLI flags > environment variables (`GEOTCHA_*`) > config
 ## Output
 
 GEOtcha produces:
-- **`gse_summary.csv`** — One row per GSE with series-level metadata
+- **`gse_summary.csv`** — One row per GSE with series-level metadata (or `.tsv` / `.parquet` with `--format`)
 - **`gsm/<GSE_ID>_samples.csv`** — Per-GSE file with sample-level metadata
-- **`manifest.json`** (in run state dir) — Audit trail: run_id, query, timestamps, counts, masked settings
-- With `--harmonize`: additional `_harmonized` columns with standardized values
+- **`manifest.json`** (in run state dir) — Audit trail: run_id, query, timestamps, stage timings, counts, masked settings
+- **`review_queue.csv`** — Low-confidence harmonized fields flagged for manual review (always CSV)
+- With `--harmonize`: additional `_harmonized`, `_source`, `_confidence`, and `_ontology_id` columns
 
 ### Fields extracted
 

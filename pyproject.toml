@@ -38,6 +38,7 @@ dependencies = [
 [project.optional-dependencies]
 llm = ["openai>=1.0", "anthropic>=0.30", "httpx>=0.27"]
 ml = ["gliner>=0.2", "sentence-transformers>=2.6", "onnxruntime>=1.17"]
+parquet = ["pyarrow>=14.0"]
 dev = ["pytest>=8.0", "pytest-cov", "ruff", "mypy"]
 
 [project.urls]

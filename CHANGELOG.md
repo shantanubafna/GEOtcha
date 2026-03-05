@@ -15,8 +15,20 @@ All notable changes to GEOtcha are documented here.
 - 7 new ML config fields in `Settings` (all with sensible defaults).
 - Three-tier harmonization chain: rules → ML → LLM, each layer only upgrading low-confidence fields.
 
+### Merged from v0.5.0 (UX/SDK features)
+- **`--format` / `-f` flag**: output as `csv`, `tsv`, or `parquet` on `extract` and `run` commands.
+- **Parquet export**: `write_gse_parquet()`, `write_gsm_parquet()`, and `write_all()` branching. Requires `pip install geotcha[parquet]`.
+- **`--log-json` flag**: structured JSON logging to stderr via `_JsonFormatter`.
+- **`geotcha report` command**: prints run summary (query, counts, failures, stage timings) and writes `report.json`.
+- **Stage timings**: `_timed()` context manager records elapsed seconds for search, extract, and export stages in `manifest.json`.
+- **`log_json` config field**: persist JSON logging preference in config.
+- **`GEOtchaClient` exported from `geotcha`**: `from geotcha import GEOtchaClient` now works.
+- **SDK improvements**: `GEOtchaClient.__init__` accepts optional `settings` kwarg; `extract()` silently skips failed parses; `run()` skips export when `output_dir` is `None`.
+- **Merged `config validate`**: now checks ML settings, NCBI email/API key, and output format.
+- **Review queue always CSV**: even when `--format parquet`, review queue remains human-readable CSV.
+
 ### Internal
-- 298 tests passing (all existing + new ML/config tests).
+- 342 tests passing (298 existing + 44 new: `test_api.py`, `test_parquet.py`, `test_report.py`, config validate additions).
 - `_harmonize_record` gains `ml_harmonizer` parameter; all existing callers unchanged when ML is off.
 
 ## [0.4.0] – 2026-02-28
