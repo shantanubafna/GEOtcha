@@ -13,7 +13,7 @@ else:
     except ModuleNotFoundError:
         import tomli as tomllib  # type: ignore[no-redef]
 from platformdirs import user_cache_dir, user_config_dir, user_data_dir
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -104,7 +104,7 @@ class Settings(BaseSettings):
     )
     ml_batch_size: int = Field(
         default=32,
-        description="Batch size for ML inference",
+        description="Batch size for ML inference (reserved for batch NER in v0.8.0)",
     )
     ml_threshold: float = Field(
         default=0.65,
@@ -138,6 +138,20 @@ class Settings(BaseSettings):
     log_json: bool = Field(
         default=False, description="Emit structured JSON logs to stderr",
     )
+
+    @field_validator("ml_mode")
+    @classmethod
+    def _validate_ml_mode(cls, v: str) -> str:
+        if v not in ("off", "hybrid", "full"):
+            raise ValueError(f"ml_mode must be off, hybrid, or full, got {v!r}")
+        return v
+
+    @field_validator("ml_device")
+    @classmethod
+    def _validate_ml_device(cls, v: str) -> str:
+        if v not in ("auto", "cpu", "cuda", "mps"):
+            raise ValueError(f"ml_device must be auto, cpu, cuda, or mps, got {v!r}")
+        return v
 
     def get_cache_dir(self) -> Path:
         d = self.cache_dir or _geotcha_cache_dir() / "soft_files"

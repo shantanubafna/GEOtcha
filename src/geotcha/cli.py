@@ -447,9 +447,18 @@ def config_show() -> None:
 @config_app.command("validate")
 def config_validate() -> None:
     """Validate current configuration."""
+    from pydantic import ValidationError
+
     from geotcha.config import Settings
 
-    settings = Settings.load()
+    try:
+        settings = Settings.load()
+    except ValidationError as exc:
+        console.print("[red]Error: Configuration is invalid.[/red]")
+        for err in exc.errors():
+            field = ".".join(str(loc) for loc in err["loc"])
+            console.print(f"  [red]{field}: {err['msg']}[/red]")
+        raise typer.Exit(1)
     warnings = []
     has_error = False
 

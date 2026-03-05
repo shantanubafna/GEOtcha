@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "geotcha"
-version = "0.6.1"
+version = "0.6.2"
 description = "Extract and harmonize RNA-seq metadata from NCBI GEO"
 readme = "README.md"
 license = "MIT"

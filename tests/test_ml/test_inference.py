@@ -38,8 +38,13 @@ class TestMLHarmonizerInit:
         h = MLHarmonizer()
         assert h.threshold == 0.65
         assert h.device == "auto"
+        assert h.review_threshold == 0.50
         assert h._ner is None
         assert h._linker is None
+
+    def test_review_threshold_wired(self):
+        h = MLHarmonizer(review_threshold=0.40)
+        assert h.review_threshold == 0.40
 
 
 class TestNeedsMl:
@@ -77,14 +82,26 @@ class TestHarmonizeGsm:
         assert result.disease_source == "ml"
         assert result.disease_confidence == 0.92
 
-    def test_low_score_flags_review(self, bare_gsm):
+    def test_score_below_review_flags_review(self, bare_gsm):
+        """Score below review_threshold → needs_review = True."""
         mock_ner = MagicMock()
         mock_ner.predict_entities.return_value = [
-            {"label": "disease", "text": "UC", "score": 0.40},
+            {"label": "disease", "text": "UC", "score": 0.30},
         ]
-        h = MLHarmonizer(ner_model=mock_ner, threshold=0.65)
+        h = MLHarmonizer(ner_model=mock_ner, threshold=0.65, review_threshold=0.50)
         result = h.harmonize_gsm(bare_gsm)
         assert result.needs_review is True
+        assert result.disease_harmonized is None
+
+    def test_score_between_thresholds_no_flag(self, bare_gsm):
+        """Score between review_threshold and threshold → no review flag, no apply."""
+        mock_ner = MagicMock()
+        mock_ner.predict_entities.return_value = [
+            {"label": "disease", "text": "UC", "score": 0.55},
+        ]
+        h = MLHarmonizer(ner_model=mock_ner, threshold=0.65, review_threshold=0.50)
+        result = h.harmonize_gsm(bare_gsm)
+        assert result.needs_review is False
         assert result.disease_harmonized is None
 
     def test_skips_high_confidence_fields(self, bare_gsm):
@@ -136,6 +153,7 @@ class TestFromConfig:
         mock_settings = MagicMock()
         mock_settings.ml_device = "cpu"
         mock_settings.ml_threshold = 0.70
+        mock_settings.ml_review_threshold = 0.45
 
         mock_ner = MagicMock()
         mock_linker = MagicMock()
@@ -148,5 +166,20 @@ class TestFromConfig:
             h = MLHarmonizer.from_config(mock_settings)
         assert h.threshold == 0.70
         assert h.device == "cpu"
+        assert h.review_threshold == 0.45
         assert h._ner is mock_ner
         assert h._linker is mock_linker
+
+    def test_review_threshold_from_config(self):
+        mock_settings = MagicMock()
+        mock_settings.ml_device = "cpu"
+        mock_settings.ml_threshold = 0.65
+        mock_settings.ml_review_threshold = 0.30
+
+        with (
+            patch("geotcha.ml.loader._resolve_device", return_value="cpu"),
+            patch("geotcha.ml.loader.load_ner_model", return_value=None),
+            patch("geotcha.ml.loader.load_linker", return_value=None),
+        ):
+            h = MLHarmonizer.from_config(mock_settings)
+        assert h.review_threshold == 0.30

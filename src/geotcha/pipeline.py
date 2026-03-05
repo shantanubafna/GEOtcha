@@ -219,12 +219,14 @@ def run_pipeline(
 
     # Create ML harmonizer if ml_mode is enabled
     ml_harmonizer = None
+    ml_fallback_reason = None
     if settings.ml_mode != "off":
         try:
             from geotcha.ml.inference import MLHarmonizer
 
             ml_harmonizer = MLHarmonizer.from_config(settings)
         except Exception as e:
+            ml_fallback_reason = str(e)
             logger.warning(f"ML models could not be loaded: {e}. Continuing without ML.")
 
     manifest: dict = {
@@ -240,6 +242,10 @@ def run_pipeline(
         "output_paths": {},
         "settings_snapshot": _build_settings_snapshot(settings),
         "stage_timings": {},
+        "ml_mode_requested": settings.ml_mode,
+        "ml_mode_effective": "off" if ml_harmonizer is None else settings.ml_mode,
+        "ml_models_loaded": ml_harmonizer is not None,
+        "ml_fallback_reason": ml_fallback_reason,
     }
 
     # Step 1: Search
@@ -324,6 +330,7 @@ def run_pipeline(
         "processed_gse_ids": [],
         "harmonize": harmonize,
         "use_llm": use_llm,
+        "ml_mode": settings.ml_mode,
         "status": "filtered",
     }
     _save_state(run_id, state, settings)
@@ -495,10 +502,21 @@ def resume_run(
     remaining = [gid for gid in all_ids if gid not in processed]
     harmonize = state.get("harmonize", False)
     use_llm = state.get("use_llm", False)
+    ml_mode = state.get("ml_mode", "off")
 
     if not remaining:
         console.print("[green]All datasets already processed.[/green]")
         return
+
+    # Restore ML harmonizer from saved state
+    ml_harmonizer = None
+    if ml_mode != "off":
+        try:
+            from geotcha.ml.inference import MLHarmonizer
+
+            ml_harmonizer = MLHarmonizer.from_config(settings)
+        except Exception as e:
+            logger.warning(f"ML models could not be loaded on resume: {e}. Continuing without ML.")
 
     console.print(
         f"Resuming run {run_id}: {len(remaining)} remaining "
@@ -506,9 +524,13 @@ def resume_run(
     )
 
     output_dir = settings.output_dir
+    fmt = settings.output_format
     records, _failed = _extract_batch(
         remaining, settings, console, harmonize, use_llm,
         include_scrna=settings.include_scrna,
+        output_dir=output_dir,
+        fmt=fmt,
+        ml_harmonizer=ml_harmonizer,
     )
 
     # Merge with existing gse_summary rows (dedup by gse_id; new records win)

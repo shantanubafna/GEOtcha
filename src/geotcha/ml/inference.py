@@ -33,11 +33,13 @@ class MLHarmonizer:
         linker_model=None,
         threshold: float = 0.65,
         device: str = "auto",
+        review_threshold: float = 0.50,
     ) -> None:
         self._ner = ner_model
         self._linker = linker_model
         self.threshold = threshold
         self.device = device
+        self.review_threshold = review_threshold
 
     @classmethod
     def from_config(cls, settings) -> MLHarmonizer:
@@ -52,6 +54,7 @@ class MLHarmonizer:
             linker_model=linker,
             threshold=settings.ml_threshold,
             device=device,
+            review_threshold=settings.ml_review_threshold,
         )
 
     def _needs_ml(self, record, field: str) -> bool:
@@ -146,7 +149,7 @@ class MLHarmonizer:
                     )
                     _apply_norm(record, field, result)
                     fields_needing_ml.remove(field)
-                else:
+                elif score < self.review_threshold:
                     record.needs_review = True
 
         return record
@@ -183,7 +186,7 @@ class MLHarmonizer:
                     )
                     _apply_norm(record, field, result)
                     fields_needing_ml.remove(field)
-                else:
+                elif score < self.review_threshold:
                     record.needs_review = True
 
         return record
