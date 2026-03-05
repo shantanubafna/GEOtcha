@@ -111,3 +111,31 @@ class GEOtchaClient:
         if output_dir:
             self.export(records, output_dir, fmt=fmt, harmonized=harmonize)
         return records
+
+    def benchmark(
+        self,
+        fixture_dir: Path | None = None,
+        ml_mode: str = "off",
+    ) -> dict:
+        """Run harmonization benchmark and return results as dict.
+
+        Args:
+            fixture_dir: Path to benchmark fixtures directory. If None, uses bundled fixtures.
+            ml_mode: "off", "hybrid", or "full".
+        """
+        from geotcha.benchmark import load_fixtures, run_benchmark
+
+        if fixture_dir is None:
+            candidate = (
+                Path(__file__).resolve().parent.parent.parent
+                / "tests" / "fixtures" / "benchmark"
+            )
+            if candidate.is_dir():
+                fixture_dir = candidate
+            else:
+                raise FileNotFoundError("No fixture directory found. Provide fixture_dir.")
+
+        fixtures = load_fixtures(fixture_dir)
+        settings = self.settings if ml_mode != "off" else None
+        result = run_benchmark(fixtures, settings=settings, ml_mode=ml_mode)
+        return result.model_dump()

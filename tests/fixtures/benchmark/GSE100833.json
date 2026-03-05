@@ -1,0 +1,40 @@
+{
+  "gse_id": "GSE100833",
+  "input": {
+    "title": "Transcriptome profiling of ileal biopsies from Crohn's disease patients",
+    "summary": "RNA-seq of ileal biopsies from CD patients and healthy controls",
+    "tissue": "ileum",
+    "disease": "crohn's disease",
+    "treatment": "infliximab",
+    "timepoint": "Week 8"
+  },
+  "expected": {
+    "tissue_harmonized": "ileum",
+    "tissue_ontology_id": "UBERON:0002116",
+    "disease_harmonized": "Crohn's disease",
+    "disease_ontology_id": "DOID:8778",
+    "treatment_harmonized": "infliximab",
+    "timepoint_harmonized": "W8"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM2694001",
+      "input": {
+        "tissue": "ileum",
+        "disease": "crohn's disease",
+        "gender": "M",
+        "age": "34 years",
+        "treatment": "infliximab 5mg/kg",
+        "cell_type": "epithelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "ileum",
+        "disease_harmonized": "Crohn's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "34",
+        "treatment_harmonized": "infliximab",
+        "cell_type_harmonized": "epithelial cell"
+      }
+    }
+  ]
+}

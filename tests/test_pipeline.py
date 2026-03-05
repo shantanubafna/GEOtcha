@@ -285,6 +285,62 @@ class TestResumeMerge:
         with pytest.raises(ClickExit):
             resume_run("nonexistent", test_settings, console=quiet_console)
 
+    def test_resume_writes_gsm_once(self, test_settings, quiet_console):
+        """GSM files are written exactly once (by _extract_batch), not duplicated in merge loop."""
+        from geotcha.models import GSMRecord
+
+        output_dir = test_settings.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        state = {
+            "run_id": "run_dup",
+            "query": "IBD",
+            "all_gse_ids": ["GSE001"],
+            "processed_gse_ids": [],
+            "harmonize": False,
+            "use_llm": False,
+            "status": "filtered",
+        }
+        _save_state("run_dup", state, test_settings)
+
+        sample = GSMRecord(gsm_id="GSM001", gse_id="GSE001")
+        record = GSERecord(gse_id="GSE001", title="Test", samples=[sample])
+
+        with patch("geotcha.pipeline.parse_gse", return_value=record), \
+             patch("geotcha.pipeline.write_gsm_file") as mock_gsm_write, \
+             patch("geotcha.pipeline.read_gse_summary", return_value=[]), \
+             patch("geotcha.pipeline.write_gse_summary_rows"):
+            resume_run("run_dup", test_settings, console=quiet_console)
+
+        # _extract_batch writes GSM once; merge loop should NOT write again
+        assert mock_gsm_write.call_count == 1
+
+    def test_resume_no_samples_no_gsm_write(self, test_settings, quiet_console):
+        """GSM write is not called when GSE has no samples."""
+        output_dir = test_settings.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        state = {
+            "run_id": "run_nosamp",
+            "query": "IBD",
+            "all_gse_ids": ["GSE002"],
+            "processed_gse_ids": [],
+            "harmonize": False,
+            "use_llm": False,
+            "status": "filtered",
+        }
+        _save_state("run_nosamp", state, test_settings)
+
+        record = GSERecord(gse_id="GSE002", title="No Samples")
+
+        with patch("geotcha.pipeline.parse_gse", return_value=record), \
+             patch("geotcha.pipeline.write_gsm_file") as mock_gsm_write, \
+             patch("geotcha.pipeline.read_gse_summary", return_value=[]), \
+             patch("geotcha.pipeline.write_gse_summary_rows"):
+            resume_run("run_nosamp", test_settings, console=quiet_console)
+
+        mock_gsm_write.assert_not_called()
+
 
 # ---------------------------------------------------------------------------
 # LLM settings propagation

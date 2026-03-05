@@ -152,11 +152,17 @@ class TestNormalizeTimepoint:
 
 
 class TestNormalizeTreatment:
-    def test_cleanup(self):
-        result = normalize_treatment("  infliximab   5mg/kg  ")
-        assert result.value == "infliximab 5mg/kg"
+    def test_known_drug(self):
+        result = normalize_treatment("infliximab")
+        assert result.value == "infliximab"
         assert result.source == "rule"
-        assert result.confidence == 0.70
+        assert result.confidence == 1.0
+
+    def test_unrecognized_cleanup(self):
+        result = normalize_treatment("  some   experimental   compound  ")
+        assert result.value == "some experimental compound"
+        assert result.source == "raw_fallback"
+        assert result.confidence == 0.50
 
     def test_none(self):
         assert normalize_treatment(None) is None
@@ -186,14 +192,22 @@ class TestHarmonizeGSM:
         # Age provenance
         assert result.age_source == "rule"
         assert result.age_confidence == 1.0
-        # Treatment provenance
+        # Treatment provenance (infliximab 5mg/kg -> substring match on "infliximab")
         assert result.treatment_source == "rule"
-        assert result.treatment_confidence == 0.70
+        assert result.treatment_confidence == 0.70  # substring tier
 
-    def test_cell_type_passthrough(self, sample_gsm: GSMRecord):
+    def test_cell_type_recognized(self, sample_gsm: GSMRecord):
         sample_gsm.cell_type = "T cell"
         result = harmonize_gsm(sample_gsm)
         assert result.cell_type_harmonized == "T cell"
+        assert result.cell_type_source == "rule"
+        assert result.cell_type_confidence == 1.0
+        assert result.cell_type_ontology_id == "CL:0000084"
+
+    def test_cell_type_unknown_fallback(self, sample_gsm: GSMRecord):
+        sample_gsm.cell_type = "rare progenitor xyz"
+        result = harmonize_gsm(sample_gsm)
+        assert result.cell_type_harmonized == "rare progenitor xyz"
         assert result.cell_type_source == "raw_fallback"
         assert result.cell_type_confidence == 0.50
 

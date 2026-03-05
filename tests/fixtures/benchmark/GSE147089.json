@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE147089",
+  "input": {
+    "title": "PBMC transcriptome in multiple sclerosis",
+    "summary": "RNA-seq of PBMCs from MS patients treated with rituximab",
+    "tissue": "PBMC",
+    "disease": "multiple sclerosis",
+    "treatment": "rituximab"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood mononuclear cell",
+    "tissue_ontology_id": "CL:2000001",
+    "disease_harmonized": "multiple sclerosis",
+    "disease_ontology_id": "DOID:2377",
+    "treatment_harmonized": "rituximab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4410001",
+      "input": {
+        "tissue": "PBMC",
+        "disease": "MS",
+        "gender": "M",
+        "age": "38 years",
+        "treatment": "rituxan",
+        "cell_type": "B cell"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood mononuclear cell",
+        "disease_harmonized": "multiple sclerosis",
+        "gender_harmonized": "male",
+        "age_harmonized": "38",
+        "treatment_harmonized": "rituximab",
+        "cell_type_harmonized": "B cell"
+      }
+    }
+  ]
+}

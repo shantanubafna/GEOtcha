@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE167363",
+  "input": {
+    "title": "Frontal cortex transcriptome in Alzheimer's",
+    "summary": "RNA-seq of frontal cortex samples from AD and control subjects",
+    "tissue": "brain",
+    "disease": "alzheimer disease",
+    "treatment": "untreated"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "Alzheimer's disease",
+    "disease_ontology_id": "DOID:10652",
+    "treatment_harmonized": "untreated"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5101001",
+      "input": {
+        "tissue": "brain",
+        "disease": "alzheimer disease",
+        "gender": "M",
+        "age": "82 years",
+        "cell_type": "astrocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "Alzheimer's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "82",
+        "cell_type_harmonized": "astrocyte"
+      }
+    }
+  ]
+}

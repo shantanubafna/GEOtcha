@@ -6,8 +6,10 @@ import re
 from typing import NamedTuple
 
 from geotcha.harmonize.ontology import (
+    lookup_cell_type_with_confidence,
     lookup_disease_with_confidence,
     lookup_tissue_with_confidence,
+    lookup_treatment_with_confidence,
 )
 from geotcha.models import GSERecord, GSMRecord
 
@@ -113,12 +115,26 @@ def normalize_timepoint(raw: str | None) -> NormResult | None:
     return NormResult(raw, "raw_fallback", 0.50, None)
 
 
-def normalize_treatment(raw: str | None) -> NormResult | None:
-    """Normalize treatment string."""
+def normalize_cell_type(raw: str | None) -> NormResult | None:
+    """Normalize cell type using Cell Ontology lookup with confidence tiers."""
     if not raw:
         return None
+    result = lookup_cell_type_with_confidence(raw)
+    if result:
+        return NormResult(result[0], "rule", result[2], result[1])
+    return NormResult(raw.strip().lower(), "raw_fallback", 0.50, None)
+
+
+def normalize_treatment(raw: str | None) -> NormResult | None:
+    """Normalize treatment using drug name lookup with confidence tiers."""
+    if not raw:
+        return None
+    result = lookup_treatment_with_confidence(raw)
+    if result:
+        return NormResult(result[0], "rule", result[2], result[1])
+    # Fallback: whitespace cleanup
     cleaned = " ".join(raw.strip().split())
-    return NormResult(cleaned, "rule", 0.70, None)
+    return NormResult(cleaned, "raw_fallback", 0.50, None)
 
 
 def _apply_norm(record, field: str, result: NormResult | None) -> None:
@@ -138,13 +154,7 @@ def harmonize_gsm(record: GSMRecord) -> GSMRecord:
     _apply_norm(record, "disease", normalize_disease(record.disease))
     _apply_norm(record, "treatment", normalize_treatment(record.treatment))
     _apply_norm(record, "timepoint", normalize_timepoint(record.timepoint))
-
-    # Cell type: pass-through with raw_fallback provenance
-    if record.cell_type:
-        record.cell_type_harmonized = record.cell_type
-        record.cell_type_source = "raw_fallback"
-        record.cell_type_confidence = 0.50
-        record.cell_type_ontology_id = None
+    _apply_norm(record, "cell_type", normalize_cell_type(record.cell_type))
 
     return record
 

@@ -1,0 +1,35 @@
+{
+  "gse_id": "GSE160804",
+  "input": {
+    "title": "Colorectal cancer transcriptome profiling",
+    "summary": "RNA-seq of colorectal tumor samples treated with 5-FU",
+    "tissue": "colon",
+    "disease": "colorectal cancer",
+    "treatment": "5-fluorouracil"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "treatment_harmonized": "5-fluorouracil"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4882001",
+      "input": {
+        "tissue": "colon",
+        "disease": "colorectal cancer",
+        "gender": "F",
+        "age": "71 years",
+        "treatment": "5-FU",
+        "cell_type": "enterocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "gender_harmonized": "female",
+        "age_harmonized": "71",
+        "treatment_harmonized": "5-fluorouracil",
+        "cell_type_harmonized": "enterocyte"
+      }
+    }
+  ]
+}

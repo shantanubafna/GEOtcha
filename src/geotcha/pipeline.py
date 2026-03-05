@@ -538,8 +538,6 @@ def resume_run(
     merged: dict[str, dict] = {row["gse_id"]: row for row in existing_rows}
     for record in records:
         merged[record.gse_id] = gse_to_row(record, harmonize)
-        if record.samples:
-            write_gsm_file(record, output_dir, settings.output_format, harmonize)
 
     write_gse_summary_rows(list(merged.values()), output_dir, settings.output_format, harmonize)
 

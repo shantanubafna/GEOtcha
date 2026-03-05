@@ -416,6 +416,100 @@ def report(
 # ---------------------------------------------------------------------------
 
 
+@app.command()
+def benchmark(
+    input_dir: Annotated[
+        Path | None,
+        typer.Option("--input", "-i", help="Benchmark fixture directory"),
+    ] = None,
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output report path (JSON)"),
+    ] = None,
+    ml_mode: Annotated[
+        str,
+        typer.Option("--ml-mode", help="ML mode for benchmark: off, hybrid, or full"),
+    ] = "off",
+) -> None:
+    """Run harmonization benchmark against curated fixtures."""
+    from geotcha.benchmark import load_fixtures, run_benchmark, write_report
+
+    if ml_mode not in ("off", "hybrid", "full"):
+        console.print(f"[red]Invalid --ml-mode: {ml_mode}. Must be off, hybrid, or full.[/red]")
+        raise typer.Exit(1)
+
+    # Resolve fixture directory
+    if input_dir is None:
+        # Try bundled test fixtures
+        candidate = (
+            Path(__file__).resolve().parent.parent.parent
+            / "tests" / "fixtures" / "benchmark"
+        )
+        if candidate.is_dir():
+            input_dir = candidate
+        else:
+            # Try importlib.resources
+            try:
+                from importlib import resources
+                pkg = resources.files("geotcha.data") / "benchmark"
+                if hasattr(pkg, "_path") and Path(str(pkg)).is_dir():
+                    input_dir = Path(str(pkg))
+            except Exception:
+                pass
+        if input_dir is None:
+            console.print("[red]No fixture directory found. Use --input to specify one.[/red]")
+            raise typer.Exit(1)
+
+    try:
+        fixtures = load_fixtures(input_dir)
+        console.print(f"Loaded [bold]{len(fixtures)}[/bold] benchmark fixtures from {input_dir}")
+
+        settings = None
+        if ml_mode != "off":
+            from geotcha.config import Settings
+            settings = Settings.load()
+
+        result = run_benchmark(fixtures, settings=settings, ml_mode=ml_mode)
+
+        # Display summary
+        console.print(f"\n[bold]Benchmark Results[/bold] (ml_mode={ml_mode})")
+        for key, val in result.summary.items():
+            console.print(f"  {key}: [bold]{val:.1%}[/bold]")
+
+        console.print("\n[bold]Per-field metrics:[/bold]")
+        for field, metrics in result.per_field.items():
+            console.print(
+                f"  {field:12s}  exact={metrics.exact_match:.1%}  "
+                f"completeness={metrics.completeness:.1%}  "
+                f"ontology={metrics.ontology_coverage:.1%}  "
+                f"mean_conf={metrics.mean_confidence:.2f}  "
+                f"({metrics.correct}/{metrics.total})"
+            )
+
+        if result.errors:
+            console.print(f"\n[yellow]{len(result.errors)} mismatches:[/yellow]")
+            for err in result.errors[:10]:
+                console.print(
+                    f"  [dim]{err['fixture']} {err['field']}: "
+                    f"expected={err['expected']!r} actual={err['actual']!r}[/dim]"
+                )
+            if len(result.errors) > 10:
+                console.print(f"  [dim]... and {len(result.errors) - 10} more[/dim]")
+
+        # Write report
+        if output is None:
+            output = Path("benchmark_report.json")
+        report_path = write_report(result, output)
+        console.print(f"\n[green]Report written: {report_path}[/green]")
+
+    except FileNotFoundError as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1)
+    except Exception as e:
+        console.print(f"[red]Benchmark failed: {e}[/red]")
+        raise typer.Exit(1)
+
+
 @config_app.command("set")
 def config_set(
     key: Annotated[str, typer.Argument(help="Configuration key")],

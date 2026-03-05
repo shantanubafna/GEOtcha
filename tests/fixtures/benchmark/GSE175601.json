@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE175601",
+  "input": {
+    "title": "Bronchial epithelium gene expression in asthma",
+    "summary": "RNA-seq of airway biopsies from asthma patients",
+    "tissue": "lung",
+    "disease": "asthma",
+    "treatment": "dupilumab"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "asthma",
+    "disease_ontology_id": "DOID:2841",
+    "treatment_harmonized": "dupilumab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5338001",
+      "input": {
+        "tissue": "lung",
+        "disease": "asthma",
+        "gender": "F",
+        "age": "35 years",
+        "cell_type": "mast cell"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "asthma",
+        "gender_harmonized": "female",
+        "age_harmonized": "35",
+        "cell_type_harmonized": "mast cell"
+      }
+    }
+  ]
+}

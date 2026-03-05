@@ -1,0 +1,31 @@
+{
+  "gse_id": "GSE153760",
+  "input": {
+    "title": "Breast cancer tumor transcriptome",
+    "summary": "RNA-seq of breast tumor biopsies treated with trastuzumab",
+    "tissue": "breast",
+    "disease": "breast cancer",
+    "treatment": "trastuzumab"
+  },
+  "expected": {
+    "tissue_harmonized": "breast",
+    "treatment_harmonized": "trastuzumab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4653001",
+      "input": {
+        "tissue": "breast",
+        "disease": "breast cancer",
+        "gender": "F",
+        "age": "56 years",
+        "treatment": "herceptin"
+      },
+      "expected": {
+        "gender_harmonized": "female",
+        "age_harmonized": "56",
+        "treatment_harmonized": "trastuzumab"
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE162154",
+  "input": {
+    "title": "Brain transcriptomics in Alzheimer's disease",
+    "summary": "RNA-seq of brain tissue from AD patients and controls",
+    "tissue": "brain",
+    "disease": "alzheimer's disease",
+    "treatment": "donepezil"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "Alzheimer's disease",
+    "disease_ontology_id": "DOID:10652",
+    "treatment_harmonized": "donepezil"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4938001",
+      "input": {
+        "tissue": "brain",
+        "disease": "AD",
+        "gender": "F",
+        "age": "78 years",
+        "cell_type": "neuron"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "Alzheimer's disease",
+        "gender_harmonized": "female",
+        "age_harmonized": "78",
+        "cell_type_harmonized": "neuron"
+      }
+    }
+  ]
+}

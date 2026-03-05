@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE138614",
+  "input": {
+    "title": "Synovial transcriptome in rheumatoid arthritis",
+    "summary": "RNA-seq of synovial biopsies from RA patients treated with methotrexate",
+    "tissue": "synovial tissue",
+    "disease": "rheumatoid arthritis",
+    "treatment": "methotrexate"
+  },
+  "expected": {
+    "tissue_harmonized": "synovial membrane",
+    "tissue_ontology_id": "UBERON:0000042",
+    "disease_harmonized": "rheumatoid arthritis",
+    "disease_ontology_id": "DOID:7148",
+    "treatment_harmonized": "methotrexate"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4113001",
+      "input": {
+        "tissue": "synovium",
+        "disease": "RA",
+        "gender": "F",
+        "age": "55 years",
+        "treatment": "MTX",
+        "cell_type": "fibroblast"
+      },
+      "expected": {
+        "tissue_harmonized": "synovial membrane",
+        "disease_harmonized": "rheumatoid arthritis",
+        "gender_harmonized": "female",
+        "age_harmonized": "55",
+        "treatment_harmonized": "methotrexate",
+        "cell_type_harmonized": "fibroblast"
+      }
+    }
+  ]
+}

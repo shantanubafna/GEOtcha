@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE150910",
+  "input": {
+    "title": "Psoriasis skin lesion transcriptomics",
+    "summary": "RNA-seq of skin biopsies from psoriasis patients",
+    "tissue": "skin",
+    "disease": "psoriasis",
+    "treatment": "secukinumab"
+  },
+  "expected": {
+    "tissue_harmonized": "skin",
+    "tissue_ontology_id": "UBERON:0002097",
+    "disease_harmonized": "psoriasis",
+    "disease_ontology_id": "DOID:8893",
+    "treatment_harmonized": "secukinumab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4562001",
+      "input": {
+        "tissue": "skin",
+        "disease": "psoriasis",
+        "gender": "M",
+        "age": "47 years",
+        "cell_type": "keratinocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "skin",
+        "disease_harmonized": "psoriasis",
+        "gender_harmonized": "male",
+        "age_harmonized": "47",
+        "cell_type_harmonized": "keratinocyte"
+      }
+    }
+  ]
+}

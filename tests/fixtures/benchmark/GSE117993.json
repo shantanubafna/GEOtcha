@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE117993",
+  "input": {
+    "title": "Colonic gene expression in pediatric UC",
+    "summary": "RNA-seq of sigmoid colon biopsies from pediatric ulcerative colitis",
+    "tissue": "sigmoid colon",
+    "disease": "ulcerative colitis",
+    "treatment": "azathioprine",
+    "timepoint": "Day 14"
+  },
+  "expected": {
+    "tissue_harmonized": "sigmoid colon",
+    "tissue_ontology_id": "UBERON:0001159",
+    "disease_harmonized": "ulcerative colitis",
+    "disease_ontology_id": "DOID:8577",
+    "treatment_harmonized": "azathioprine",
+    "timepoint_harmonized": "D14"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM3319001",
+      "input": {
+        "tissue": "sigmoid colon",
+        "disease": "ulcerative colitis",
+        "gender": "F",
+        "age": "14 years",
+        "cell_type": "goblet cell"
+      },
+      "expected": {
+        "tissue_harmonized": "sigmoid colon",
+        "disease_harmonized": "ulcerative colitis",
+        "gender_harmonized": "female",
+        "age_harmonized": "14",
+        "cell_type_harmonized": "goblet cell"
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "gse_id": "GSE180811",
+  "input": {
+    "title": "Healthy blood transcriptome reference",
+    "summary": "RNA-seq of whole blood from healthy donors",
+    "tissue": "blood",
+    "disease": "healthy",
+    "treatment": "untreated"
+  },
+  "expected": {
+    "tissue_harmonized": "blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "healthy",
+    "treatment_harmonized": "untreated"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5475001",
+      "input": {
+        "tissue": "whole blood",
+        "disease": "healthy control",
+        "gender": "M",
+        "age": "29 years",
+        "cell_type": "T cell"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "healthy",
+        "gender_harmonized": "male",
+        "age_harmonized": "29",
+        "cell_type_harmonized": "T cell"
+      }
+    },
+    {
+      "gsm_id": "GSM5475002",
+      "input": {
+        "tissue": "blood",
+        "disease": "normal",
+        "gender": "F",
+        "age": "34 years",
+        "cell_type": "NK cell"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "healthy",
+        "gender_harmonized": "female",
+        "age_harmonized": "34",
+        "cell_type_harmonized": "natural killer cell"
+      }
+    }
+  ]
+}

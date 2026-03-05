@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE164805",
+  "input": {
+    "title": "Substantia nigra transcriptome in Parkinson's disease",
+    "summary": "RNA-seq of brain tissue from PD patients",
+    "tissue": "brain",
+    "disease": "parkinson's disease",
+    "treatment": "levodopa"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "Parkinson's disease",
+    "disease_ontology_id": "DOID:14330",
+    "treatment_harmonized": "levodopa"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5020001",
+      "input": {
+        "tissue": "brain",
+        "disease": "PD",
+        "gender": "M",
+        "age": "69 years",
+        "cell_type": "microglia"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "Parkinson's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "69",
+        "cell_type_harmonized": "microglia"
+      }
+    }
+  ]
+}

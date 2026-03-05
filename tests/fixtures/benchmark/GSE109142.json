@@ -1,0 +1,40 @@
+{
+  "gse_id": "GSE109142",
+  "input": {
+    "title": "Gene expression in colon biopsies from ulcerative colitis patients",
+    "summary": "RNA-seq analysis of colonic mucosa from UC patients treated with vedolizumab",
+    "tissue": "colon",
+    "disease": "UC",
+    "treatment": "vedolizumab",
+    "timepoint": "Week 14"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "ulcerative colitis",
+    "disease_ontology_id": "DOID:8577",
+    "treatment_harmonized": "vedolizumab",
+    "timepoint_harmonized": "W14"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM2930001",
+      "input": {
+        "tissue": "colon",
+        "disease": "ulcerative colitis",
+        "gender": "F",
+        "age": "28 years",
+        "treatment": "vedolizumab",
+        "timepoint": "Week 14"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "ulcerative colitis",
+        "gender_harmonized": "female",
+        "age_harmonized": "28",
+        "treatment_harmonized": "vedolizumab",
+        "timepoint_harmonized": "W14"
+      }
+    }
+  ]
+}

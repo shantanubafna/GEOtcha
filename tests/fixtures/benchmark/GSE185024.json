@@ -1,0 +1,35 @@
+{
+  "gse_id": "GSE185024",
+  "input": {
+    "title": "Bone marrow transcriptome in healthy volunteers",
+    "summary": "RNA-seq of bone marrow aspirates from healthy donors",
+    "tissue": "bone marrow",
+    "disease": "control",
+    "treatment": "untreated"
+  },
+  "expected": {
+    "tissue_harmonized": "bone marrow",
+    "tissue_ontology_id": "UBERON:0002371",
+    "disease_harmonized": "healthy",
+    "treatment_harmonized": "untreated"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5600001",
+      "input": {
+        "tissue": "bone marrow",
+        "disease": "control",
+        "gender": "F",
+        "age": "26 years",
+        "cell_type": "hematopoietic stem cell"
+      },
+      "expected": {
+        "tissue_harmonized": "bone marrow",
+        "disease_harmonized": "healthy",
+        "gender_harmonized": "female",
+        "age_harmonized": "26",
+        "cell_type_harmonized": "hematopoietic stem cell"
+      }
+    }
+  ]
+}

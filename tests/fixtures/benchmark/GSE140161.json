@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE140161",
+  "input": {
+    "title": "Blood transcriptomics in systemic lupus erythematosus",
+    "summary": "RNA-seq of peripheral blood from SLE patients",
+    "tissue": "peripheral blood",
+    "disease": "SLE",
+    "treatment": "untreated"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "systemic lupus erythematosus",
+    "disease_ontology_id": "DOID:9074",
+    "treatment_harmonized": "untreated"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4161001",
+      "input": {
+        "tissue": "blood",
+        "disease": "lupus",
+        "gender": "F",
+        "age": "32 years",
+        "cell_type": "monocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "systemic lupus erythematosus",
+        "gender_harmonized": "female",
+        "age_harmonized": "32",
+        "cell_type_harmonized": "monocyte"
+      }
+    }
+  ]
+}

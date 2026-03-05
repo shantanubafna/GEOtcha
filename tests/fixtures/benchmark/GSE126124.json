@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE126124",
+  "input": {
+    "title": "Transcriptomic profiling of CD ileal resections",
+    "summary": "RNA-seq from ileal resection specimens in Crohn's disease patients",
+    "tissue": "ileal mucosa",
+    "disease": "CD",
+    "treatment": "adalimumab"
+  },
+  "expected": {
+    "tissue_harmonized": "ileal mucosa",
+    "tissue_ontology_id": "UBERON:0000331",
+    "disease_harmonized": "Crohn's disease",
+    "disease_ontology_id": "DOID:8778",
+    "treatment_harmonized": "adalimumab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM3590001",
+      "input": {
+        "tissue": "ileum",
+        "disease": "CD",
+        "gender": "M",
+        "age": "41 years",
+        "treatment": "humira"
+      },
+      "expected": {
+        "tissue_harmonized": "ileum",
+        "disease_harmonized": "Crohn's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "41",
+        "treatment_harmonized": "adalimumab"
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "gse_id": "GSE190595",
+  "input": {
+    "title": "Normal colon reference transcriptome",
+    "summary": "RNA-seq of colon biopsies from healthy volunteers",
+    "tissue": "colon",
+    "disease": "normal",
+    "treatment": "untreated"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "healthy",
+    "treatment_harmonized": "untreated"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5710001",
+      "input": {
+        "tissue": "colon",
+        "disease": "healthy",
+        "gender": "M",
+        "age": "42 years",
+        "cell_type": "goblet cell"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "healthy",
+        "gender_harmonized": "male",
+        "age_harmonized": "42",
+        "cell_type_harmonized": "goblet cell"
+      }
+    }
+  ]
+}

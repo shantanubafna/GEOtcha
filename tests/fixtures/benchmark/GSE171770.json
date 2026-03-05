@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE171770",
+  "input": {
+    "title": "Airway epithelium transcriptome in COPD",
+    "summary": "RNA-seq of bronchial biopsies from COPD patients",
+    "tissue": "lung",
+    "disease": "COPD",
+    "treatment": "budesonide"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "chronic obstructive pulmonary disease",
+    "disease_ontology_id": "DOID:3083",
+    "treatment_harmonized": "budesonide"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM5225001",
+      "input": {
+        "tissue": "lung",
+        "disease": "COPD",
+        "gender": "M",
+        "age": "61 years",
+        "treatment": "budesonide",
+        "cell_type": "epithelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "chronic obstructive pulmonary disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "61",
+        "treatment_harmonized": "budesonide",
+        "cell_type_harmonized": "epithelial cell"
+      }
+    }
+  ]
+}

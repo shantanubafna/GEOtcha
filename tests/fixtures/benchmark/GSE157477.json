@@ -1,0 +1,33 @@
+{
+  "gse_id": "GSE157477",
+  "input": {
+    "title": "Lung adenocarcinoma RNA-seq",
+    "summary": "Transcriptomic analysis of lung tumor and adjacent normal tissue",
+    "tissue": "lung",
+    "disease": "lung adenocarcinoma",
+    "treatment": "cisplatin"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "treatment_harmonized": "cisplatin"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM4766001",
+      "input": {
+        "tissue": "lung",
+        "disease": "lung adenocarcinoma",
+        "gender": "M",
+        "age": "63 years",
+        "treatment": "cisplatin"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "gender_harmonized": "male",
+        "age_harmonized": "63",
+        "treatment_harmonized": "cisplatin"
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE112366",
+  "input": {
+    "title": "RNA-seq of rectal biopsies in IBD",
+    "summary": "Transcriptomic analysis of rectal mucosa in inflammatory bowel disease",
+    "tissue": "rectum",
+    "disease": "IBD",
+    "treatment": "mesalamine",
+    "timepoint": "baseline"
+  },
+  "expected": {
+    "tissue_harmonized": "rectum",
+    "tissue_ontology_id": "UBERON:0001052",
+    "disease_harmonized": "inflammatory bowel disease",
+    "disease_ontology_id": "DOID:0050589",
+    "treatment_harmonized": "mesalamine",
+    "timepoint_harmonized": "baseline"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM3070001",
+      "input": {
+        "tissue": "rectal mucosa",
+        "disease": "IBD",
+        "gender": "M",
+        "age": "52 years",
+        "treatment": "5-ASA"
+      },
+      "expected": {
+        "tissue_harmonized": "rectal mucosa",
+        "disease_harmonized": "inflammatory bowel disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "52",
+        "treatment_harmonized": "mesalamine"
+      }
+    }
+  ]
+}
