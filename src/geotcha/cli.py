@@ -113,16 +113,40 @@ def extract(
         bool,
         typer.Option("--include-scrna", help="Include single-cell RNA-seq datasets"),
     ] = False,
+    ml_mode: Annotated[
+        str,
+        typer.Option("--ml-mode", help="ML harmonization: off, hybrid, or full"),
+    ] = "off",
+    ml_device: Annotated[
+        str,
+        typer.Option("--ml-device", help="Device for ML inference: auto, cpu, cuda, or mps"),
+    ] = "auto",
+    ml_batch_size: Annotated[
+        int,
+        typer.Option("--ml-batch-size", help="Batch size for ML inference"),
+    ] = 32,
+    ml_threshold: Annotated[
+        float,
+        typer.Option("--ml-threshold", help="Min ML confidence to accept prediction"),
+    ] = 0.65,
 ) -> None:
     """Extract metadata from specific GSE IDs."""
     from geotcha.config import Settings
     from geotcha.exceptions import GEOtchaError
     from geotcha.pipeline import run_extract
 
+    if ml_mode not in ("off", "hybrid", "full"):
+        console.print(f"[red]Invalid --ml-mode: {ml_mode}. Must be off, hybrid, or full.[/red]")
+        raise typer.Exit(1)
+
     try:
         settings = Settings.load(
             ncbi_api_key=api_key, output_dir=output,
             include_scrna=include_scrna or None,
+            ml_mode=ml_mode if ml_mode != "off" else None,
+            ml_device=ml_device if ml_device != "auto" else None,
+            ml_batch_size=ml_batch_size if ml_batch_size != 32 else None,
+            ml_threshold=ml_threshold if ml_threshold != 0.65 else None,
         )
         run_extract(gse_ids, settings, harmonize=harmonize, console=console)
     except GEOtchaError as e:
@@ -184,11 +208,31 @@ def run(
         int | None,
         typer.Option("--cache-ttl-days", help="Entrez cache TTL in days (default 7)"),
     ] = None,
+    ml_mode: Annotated[
+        str,
+        typer.Option("--ml-mode", help="ML harmonization: off, hybrid, or full"),
+    ] = "off",
+    ml_device: Annotated[
+        str,
+        typer.Option("--ml-device", help="Device for ML inference: auto, cpu, cuda, or mps"),
+    ] = "auto",
+    ml_batch_size: Annotated[
+        int,
+        typer.Option("--ml-batch-size", help="Batch size for ML inference"),
+    ] = 32,
+    ml_threshold: Annotated[
+        float,
+        typer.Option("--ml-threshold", help="Min ML confidence to accept prediction"),
+    ] = 0.65,
 ) -> None:
     """Run the full pipeline: search, filter, extract, and export."""
     from geotcha.config import Settings
     from geotcha.exceptions import GEOtchaError
     from geotcha.pipeline import run_pipeline
+
+    if ml_mode not in ("off", "hybrid", "full"):
+        console.print(f"[red]Invalid --ml-mode: {ml_mode}. Must be off, hybrid, or full.[/red]")
+        raise typer.Exit(1)
 
     try:
         settings = Settings.load(
@@ -201,6 +245,10 @@ def run(
             non_interactive=non_interactive or None,
             max_workers=max_workers,
             cache_ttl_days=cache_ttl_days,
+            ml_mode=ml_mode if ml_mode != "off" else None,
+            ml_device=ml_device if ml_device != "auto" else None,
+            ml_batch_size=ml_batch_size if ml_batch_size != 32 else None,
+            ml_threshold=ml_threshold if ml_threshold != 0.65 else None,
         )
         run_pipeline(
             query=query,
@@ -264,3 +312,38 @@ def config_show() -> None:
             value = value[:4] + "..." + value[-4:]
         desc = field_info.description or ""
         console.print(f"  [bold]{field_name}[/bold] = {value}  [dim]# {desc}[/dim]")
+
+
+@config_app.command("validate")
+def config_validate() -> None:
+    """Validate current configuration."""
+    from geotcha.config import Settings
+
+    settings = Settings.load()
+    warnings = []
+
+    if settings.ml_mode not in ("off", "hybrid", "full"):
+        warnings.append(
+            f"ml_mode={settings.ml_mode!r} is invalid. Must be off, hybrid, or full."
+        )
+
+    if settings.ml_threshold < 0 or settings.ml_threshold > 1:
+        warnings.append(
+            f"ml_threshold={settings.ml_threshold} is out of range [0, 1]."
+        )
+
+    if settings.ml_review_threshold < 0 or settings.ml_review_threshold > 1:
+        warnings.append(
+            f"ml_review_threshold={settings.ml_review_threshold} is out of range [0, 1]."
+        )
+
+    if settings.ml_device not in ("auto", "cpu", "cuda", "mps"):
+        warnings.append(
+            f"ml_device={settings.ml_device!r} is invalid. Must be auto, cpu, cuda, or mps."
+        )
+
+    if warnings:
+        for w in warnings:
+            console.print(f"[yellow]Warning: {w}[/yellow]")
+    else:
+        console.print("[green]Configuration is valid.[/green]")
