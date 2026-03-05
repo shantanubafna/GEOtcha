@@ -5,8 +5,11 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 import uuid
+from collections.abc import Generator
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,6 +33,14 @@ from geotcha.search.filters import filter_results
 from geotcha.search.query_builder import build_query
 
 logger = logging.getLogger(__name__)
+
+
+@contextmanager
+def _timed(timings: dict, key: str) -> Generator[None, None, None]:
+    """Context manager that records elapsed seconds for a pipeline stage."""
+    t0 = time.monotonic()
+    yield
+    timings[key] = round(time.monotonic() - t0, 2)
 
 
 def _build_settings_snapshot(settings: Settings) -> dict:
@@ -193,6 +204,7 @@ def run_pipeline(
     harmonize: bool = False,
     use_llm: bool = False,
     console: Console | None = None,
+    fmt: str = "csv",
 ) -> None:
     """Run the full pipeline: search → filter → extract → export."""
     if console is None:
@@ -203,6 +215,7 @@ def run_pipeline(
     started_at = datetime.now(timezone.utc).isoformat()
     all_failed: list[tuple[str, str]] = []
     non_interactive = settings.non_interactive or settings.yes
+    timings: dict[str, float] = {}
 
     # Create ML harmonizer if ml_mode is enabled
     ml_harmonizer = None
@@ -226,15 +239,17 @@ def run_pipeline(
         "failed_ids": [],
         "output_paths": {},
         "settings_snapshot": _build_settings_snapshot(settings),
+        "stage_timings": {},
     }
 
     # Step 1: Search
-    with console.status("[bold green]Building search query..."):
-        expanded_query = build_query(query)
-    console.print(f"[bold]Search query:[/bold] {expanded_query[:120]}...")
+    with _timed(timings, "search"):
+        with console.status("[bold green]Building search query..."):
+            expanded_query = build_query(query)
+        console.print(f"[bold]Search query:[/bold] {expanded_query[:120]}...")
 
-    with console.status("[bold green]Searching GEO..."):
-        raw_ids = search_geo(expanded_query, settings)
+        with console.status("[bold green]Searching GEO..."):
+            raw_ids = search_geo(expanded_query, settings)
     manifest["total_ids"] = len(raw_ids)
     console.print(f"[bold]Raw results:[/bold] {len(raw_ids)} datasets found")
 
@@ -329,16 +344,18 @@ def run_pipeline(
 
         console.print(f"\nProcessing {len(subset_ids)}/{len(filtered_ids)} datasets...")
 
-        records, failed = _extract_batch(
-            subset_ids, settings, console, harmonize, use_llm,
-            include_scrna=settings.include_scrna,
-            output_dir=output_dir,
-            fmt=settings.output_format,
-            ml_harmonizer=ml_harmonizer,
-        )
-        all_failed.extend(failed)
+        with _timed(timings, "extract"):
+            records, failed = _extract_batch(
+                subset_ids, settings, console, harmonize, use_llm,
+                include_scrna=settings.include_scrna,
+                output_dir=output_dir,
+                fmt=fmt,
+                ml_harmonizer=ml_harmonizer,
+            )
+            all_failed.extend(failed)
 
-        paths = write_all(records, output_dir, settings.output_format, harmonize)
+        with _timed(timings, "export"):
+            paths = write_all(records, output_dir, fmt, harmonize)
         console.print(
             f"\n[green]Results: {paths.get('gse_summary', '')} "
             f"({len(records)} rows), {output_dir / 'gsm'} "
@@ -350,6 +367,7 @@ def run_pipeline(
         manifest["processed_ids"] = len(records)
         manifest["failed_ids"] = [gid for gid, _ in all_failed]
         manifest["output_paths"] = {k: str(v) for k, v in paths.items()}
+        manifest["stage_timings"] = timings
         _save_state(run_id, state, settings)
         _save_manifest(run_id, manifest, settings)
 
@@ -369,37 +387,42 @@ def run_pipeline(
                 return
 
             console.print(f"\nProcessing remaining {len(remaining_ids)} datasets...")
-            more_records, more_failed = _extract_batch(
-                remaining_ids, settings, console, harmonize, use_llm,
-                include_scrna=settings.include_scrna,
-                output_dir=output_dir,
-                fmt=settings.output_format,
-                ml_harmonizer=ml_harmonizer,
-            )
-            all_failed.extend(more_failed)
-            records.extend(more_records)
+            with _timed(timings, "extract"):
+                more_records, more_failed = _extract_batch(
+                    remaining_ids, settings, console, harmonize, use_llm,
+                    include_scrna=settings.include_scrna,
+                    output_dir=output_dir,
+                    fmt=fmt,
+                    ml_harmonizer=ml_harmonizer,
+                )
+                all_failed.extend(more_failed)
+                records.extend(more_records)
 
-            paths = write_all(records, output_dir, settings.output_format, harmonize)
+            with _timed(timings, "export"):
+                paths = write_all(records, output_dir, fmt, harmonize)
             state["processed_gse_ids"] = filtered_ids
             state["status"] = "complete"
             manifest["processed_ids"] = len(records)
             manifest["failed_ids"] = [gid for gid, _ in all_failed]
             manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
             manifest["output_paths"] = {k: str(v) for k, v in paths.items()}
+            manifest["stage_timings"] = timings
             _save_state(run_id, state, settings)
             _save_manifest(run_id, manifest, settings)
     else:
         # No subset — process all
         console.print(f"\nProcessing {len(filtered_ids)} datasets...")
-        records, failed = _extract_batch(
-            filtered_ids, settings, console, harmonize, use_llm,
-            include_scrna=settings.include_scrna,
-            output_dir=output_dir,
-            fmt=settings.output_format,
-            ml_harmonizer=ml_harmonizer,
-        )
-        all_failed.extend(failed)
-        paths = write_all(records, output_dir, settings.output_format, harmonize)
+        with _timed(timings, "extract"):
+            records, failed = _extract_batch(
+                filtered_ids, settings, console, harmonize, use_llm,
+                include_scrna=settings.include_scrna,
+                output_dir=output_dir,
+                fmt=fmt,
+                ml_harmonizer=ml_harmonizer,
+            )
+            all_failed.extend(failed)
+        with _timed(timings, "export"):
+            paths = write_all(records, output_dir, fmt, harmonize)
 
         state["processed_gse_ids"] = filtered_ids
         state["status"] = "complete"
@@ -407,6 +430,7 @@ def run_pipeline(
         manifest["failed_ids"] = [gid for gid, _ in all_failed]
         manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
         manifest["output_paths"] = {k: str(v) for k, v in paths.items()}
+        manifest["stage_timings"] = timings
         _save_state(run_id, state, settings)
         _save_manifest(run_id, manifest, settings)
 
@@ -420,6 +444,7 @@ def run_extract(
     settings: Settings,
     harmonize: bool = False,
     console: Console | None = None,
+    fmt: str = "csv",
 ) -> None:
     """Extract metadata from specific GSE IDs (direct mode)."""
     if console is None:
@@ -442,11 +467,11 @@ def run_extract(
         gse_ids, settings, console, harmonize,
         include_scrna=settings.include_scrna,
         output_dir=output_dir,
-        fmt=settings.output_format,
+        fmt=fmt,
         ml_harmonizer=ml_harmonizer,
     )
 
-    write_all(records, output_dir, settings.output_format, harmonize)
+    write_all(records, output_dir, fmt, harmonize)
     console.print("\n[bold green]Extraction complete![/bold green]")
     console.print(f"[dim]Output: {output_dir}[/dim]")
 

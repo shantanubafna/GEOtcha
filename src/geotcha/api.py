@@ -23,8 +23,8 @@ class GEOtchaClient:
         records = client.harmonize(records)
     """
 
-    def __init__(self, **kwargs) -> None:
-        self.settings = Settings.load(**kwargs)
+    def __init__(self, settings: Settings | None = None, **kwargs) -> None:
+        self.settings = settings or Settings.load(**kwargs)
 
     def search(self, query: str) -> list[str]:
         """Search GEO and return filtered GSE IDs."""
@@ -37,13 +37,18 @@ class GEOtchaClient:
         return filter_results(raw_ids, self.settings, query=query)
 
     def extract(self, gse_ids: list[str]) -> list[GSERecord]:
-        """Extract metadata for a list of GSE IDs."""
+        """Extract metadata for a list of GSE IDs.
+
+        Failed parses are silently skipped and not included in the result.
+        """
         from geotcha.extract.gse_parser import parse_gse
 
         records = []
         for gse_id in gse_ids:
-            record = parse_gse(gse_id, self.settings)
-            records.append(record)
+            try:
+                records.append(parse_gse(gse_id, self.settings))
+            except Exception:
+                logger.warning(f"Failed to parse {gse_id}, skipping")
         return records
 
     def harmonize(
@@ -88,7 +93,7 @@ class GEOtchaClient:
         from geotcha.export.writers import write_all
 
         out = output_dir or self.settings.output_dir
-        return write_all(records, out, fmt, harmonized)
+        return write_all(records, out, fmt=fmt, harmonized=harmonized)
 
     def run(
         self,
@@ -103,5 +108,6 @@ class GEOtchaClient:
         records = self.extract(ids)
         if harmonize:
             records = self.harmonize(records, ml_mode=ml_mode)
-        self.export(records, output_dir, fmt, harmonize)
+        if output_dir:
+            self.export(records, output_dir, fmt=fmt, harmonized=harmonize)
         return records

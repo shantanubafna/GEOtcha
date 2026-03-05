@@ -134,6 +134,11 @@ class Settings(BaseSettings):
         default=False, description="Auto-confirm all prompts (equivalent to non-interactive)",
     )
 
+    # Logging
+    log_json: bool = Field(
+        default=False, description="Emit structured JSON logs to stderr",
+    )
+
     def get_cache_dir(self) -> Path:
         d = self.cache_dir or _geotcha_cache_dir() / "soft_files"
         d.mkdir(parents=True, exist_ok=True)

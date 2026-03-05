@@ -110,7 +110,11 @@ def _get_delimiter(fmt: str) -> str:
 
 
 def _get_extension(fmt: str) -> str:
-    return ".tsv" if fmt == "tsv" else ".csv"
+    if fmt == "tsv":
+        return ".tsv"
+    if fmt == "parquet":
+        return ".parquet"
+    return ".csv"
 
 
 def _build_gse_fields(harmonized: bool) -> list[str]:
@@ -395,6 +399,43 @@ def write_review_queue(
     return filepath
 
 
+def write_gse_parquet(
+    records: list[GSERecord],
+    output_dir: Path,
+    harmonized: bool = False,
+) -> Path:
+    """Write GSE summary as a Parquet file (requires pyarrow)."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    rows = [gse_to_row(r, harmonized) for r in records]
+    table = pa.Table.from_pylist(rows)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    filepath = output_dir / "gse_summary.parquet"
+    pq.write_table(table, filepath)
+    logger.info(f"Wrote GSE parquet: {filepath} ({len(records)} records)")
+    return filepath
+
+
+def write_gsm_parquet(
+    gse_record: GSERecord,
+    output_dir: Path,
+    harmonized: bool = False,
+) -> Path:
+    """Write per-GSE GSM samples as a Parquet file (requires pyarrow)."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    rows = [_gsm_to_row(s, harmonized) for s in gse_record.samples]
+    table = pa.Table.from_pylist(rows)
+    gsm_dir = output_dir / "gsm"
+    gsm_dir.mkdir(parents=True, exist_ok=True)
+    filepath = gsm_dir / f"{gse_record.gse_id}_samples.parquet"
+    pq.write_table(table, filepath)
+    logger.info(f"Wrote GSM parquet: {filepath} ({len(gse_record.samples)} samples)")
+    return filepath
+
+
 def write_all(
     records: list[GSERecord],
     output_dir: Path,
@@ -404,15 +445,21 @@ def write_all(
     """Write all output files: GSE summary + per-GSE GSM files + review queue."""
     paths: dict[str, Path] = {}
 
-    paths["gse_summary"] = write_gse_summary(records, output_dir, fmt, harmonized)
+    if fmt == "parquet":
+        paths["gse_summary"] = write_gse_parquet(records, output_dir, harmonized)
+        for record in records:
+            if record.samples:
+                paths[record.gse_id] = write_gsm_parquet(record, output_dir, harmonized)
+    else:
+        paths["gse_summary"] = write_gse_summary(records, output_dir, fmt, harmonized)
+        for record in records:
+            if record.samples:
+                path = write_gsm_file(record, output_dir, fmt, harmonized)
+                paths[record.gse_id] = path
 
-    for record in records:
-        if record.samples:
-            path = write_gsm_file(record, output_dir, fmt, harmonized)
-            paths[record.gse_id] = path
-
+    # Review queue always CSV (human-readable)
     if harmonized:
-        review_path = write_review_queue(records, output_dir, fmt)
+        review_path = write_review_queue(records, output_dir, "csv")
         if review_path:
             paths["review_queue"] = review_path
 
