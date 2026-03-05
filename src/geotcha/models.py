@@ -40,6 +40,8 @@ class GSMRecord(BaseModel):
     clinical_severity: str | None = Field(default=None, description="Clinical severity endpoint")
     description: str = Field(default="")
 
+    needs_review: bool = Field(default=False, description="Flagged for manual review by ML")
+
     # Harmonized fields (populated after harmonization)
     tissue_harmonized: str | None = Field(default=None)
     cell_type_harmonized: str | None = Field(default=None)
@@ -108,6 +110,8 @@ class GSERecord(BaseModel):
     )
     num_responders: int = Field(default=0, description="Count of responder samples")
     num_non_responders: int = Field(default=0, description="Count of non-responder samples")
+
+    needs_review: bool = Field(default=False, description="Flagged for manual review by ML")
 
     # Sample records
     samples: list[GSMRecord] = Field(default_factory=list, exclude=True)

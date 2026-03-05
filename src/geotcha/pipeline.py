@@ -84,6 +84,7 @@ def _extract_batch(
     include_scrna: bool = False,
     output_dir: Path | None = None,
     fmt: str = "csv",
+    ml_harmonizer=None,
 ) -> tuple[list[GSERecord], list[tuple[str, str]]]:
     """Extract metadata for a batch of GSE IDs with parallel workers and progress tracking.
 
@@ -101,7 +102,7 @@ def _extract_batch(
     def _process_one(idx: int, gse_id: str) -> tuple[int, GSERecord]:
         record = parse_gse(gse_id, settings, include_scrna=include_scrna)
         if harmonize:
-            record = _harmonize_record(record, use_llm, settings)
+            record = _harmonize_record(record, use_llm, settings, ml_harmonizer)
         return idx, record
 
     with Progress(
@@ -149,13 +150,26 @@ def _harmonize_record(
     record: GSERecord,
     use_llm: bool = False,
     settings: Settings | None = None,
+    ml_harmonizer=None,
 ) -> GSERecord:
-    """Apply harmonization to a GSERecord and its samples."""
+    """Apply harmonization: rules -> ML (optional) -> LLM (optional)."""
     from geotcha.harmonize.rules import harmonize_gse, harmonize_gsm
 
+    # Step 1: Rules (always run first)
     record = harmonize_gse(record)
     record.samples = [harmonize_gsm(s) for s in record.samples]
 
+    # Step 2: ML (when ml_harmonizer is provided)
+    if ml_harmonizer is not None:
+        try:
+            record = ml_harmonizer.harmonize_gse(record)
+            record.samples = [
+                ml_harmonizer.harmonize_gsm(s) for s in record.samples
+            ]
+        except Exception as e:
+            logger.warning(f"ML harmonization failed: {e}")
+
+    # Step 3: LLM (existing, optional)
     if use_llm:
         try:
             from geotcha.harmonize.llm import llm_harmonize_record
@@ -189,6 +203,16 @@ def run_pipeline(
     started_at = datetime.now(timezone.utc).isoformat()
     all_failed: list[tuple[str, str]] = []
     non_interactive = settings.non_interactive or settings.yes
+
+    # Create ML harmonizer if ml_mode is enabled
+    ml_harmonizer = None
+    if settings.ml_mode != "off":
+        try:
+            from geotcha.ml.inference import MLHarmonizer
+
+            ml_harmonizer = MLHarmonizer.from_config(settings)
+        except Exception as e:
+            logger.warning(f"ML models could not be loaded: {e}. Continuing without ML.")
 
     manifest: dict = {
         "run_id": run_id,
@@ -310,6 +334,7 @@ def run_pipeline(
             include_scrna=settings.include_scrna,
             output_dir=output_dir,
             fmt=settings.output_format,
+            ml_harmonizer=ml_harmonizer,
         )
         all_failed.extend(failed)
 
@@ -349,6 +374,7 @@ def run_pipeline(
                 include_scrna=settings.include_scrna,
                 output_dir=output_dir,
                 fmt=settings.output_format,
+                ml_harmonizer=ml_harmonizer,
             )
             all_failed.extend(more_failed)
             records.extend(more_records)
@@ -370,6 +396,7 @@ def run_pipeline(
             include_scrna=settings.include_scrna,
             output_dir=output_dir,
             fmt=settings.output_format,
+            ml_harmonizer=ml_harmonizer,
         )
         all_failed.extend(failed)
         paths = write_all(records, output_dir, settings.output_format, harmonize)
@@ -398,6 +425,16 @@ def run_extract(
     if console is None:
         console = Console()
 
+    # Create ML harmonizer if ml_mode is enabled
+    ml_harmonizer = None
+    if settings.ml_mode != "off":
+        try:
+            from geotcha.ml.inference import MLHarmonizer
+
+            ml_harmonizer = MLHarmonizer.from_config(settings)
+        except Exception as e:
+            logger.warning(f"ML models could not be loaded: {e}. Continuing without ML.")
+
     output_dir = settings.output_dir
     console.print(f"Extracting metadata for {len(gse_ids)} GSE ID(s)...")
 
@@ -406,6 +443,7 @@ def run_extract(
         include_scrna=settings.include_scrna,
         output_dir=output_dir,
         fmt=settings.output_format,
+        ml_harmonizer=ml_harmonizer,
     )
 
     write_all(records, output_dir, settings.output_format, harmonize)

@@ -85,6 +85,36 @@ class Settings(BaseSettings):
     llm_model: str | None = Field(default=None, description="LLM model name")
     llm_api_key: str | None = Field(default=None, description="LLM API key")
 
+    # ML settings
+    ml_mode: str = Field(
+        default="off",
+        description="ML harmonization mode: off, hybrid, or full",
+    )
+    ml_model_dir: Path | None = Field(
+        default=None,
+        description="Directory containing ML model artifacts",
+    )
+    ml_model_version: str = Field(
+        default="v1",
+        description="ML model version tag",
+    )
+    ml_device: str = Field(
+        default="auto",
+        description="Device for ML inference: auto, cpu, cuda, or mps",
+    )
+    ml_batch_size: int = Field(
+        default=32,
+        description="Batch size for ML inference",
+    )
+    ml_threshold: float = Field(
+        default=0.65,
+        description="Minimum ML confidence to accept a prediction",
+    )
+    ml_review_threshold: float = Field(
+        default=0.50,
+        description="Below this confidence, flag for manual review",
+    )
+
     # Data directory for runs
     data_dir: Path | None = Field(default=None, description="Directory for run state files")
 
