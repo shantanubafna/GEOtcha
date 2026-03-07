@@ -197,6 +197,20 @@ def _harmonize_record(
     return record
 
 
+def _build_pack_query(pack) -> str:
+    """Build an Entrez query from a disease pack's search terms."""
+    terms = pack.search_terms
+    if not terms:
+        return ""
+    quoted = [f'"{t}"' for t in terms]
+    disease_part = " OR ".join(quoted)
+    return (
+        f"({disease_part})"
+        ' AND "Homo sapiens"[Organism]'
+        ' AND "Expression profiling by high throughput sequencing"[DataSet Type]'
+    )
+
+
 def run_pipeline(
     query: str,
     settings: Settings,
@@ -205,8 +219,13 @@ def run_pipeline(
     use_llm: bool = False,
     console: Console | None = None,
     fmt: str = "csv",
+    pack=None,
 ) -> None:
-    """Run the full pipeline: search → filter → extract → export."""
+    """Run the full pipeline: search → filter → extract → export.
+
+    Args:
+        pack: Optional DiseasePack for pre-configured search expansion.
+    """
     if console is None:
         console = Console()
 
@@ -246,12 +265,16 @@ def run_pipeline(
         "ml_mode_effective": "off" if ml_harmonizer is None else settings.ml_mode,
         "ml_models_loaded": ml_harmonizer is not None,
         "ml_fallback_reason": ml_fallback_reason,
+        "pack": pack.name if pack else None,
     }
 
     # Step 1: Search
     with _timed(timings, "search"):
         with console.status("[bold green]Building search query..."):
-            expanded_query = build_query(query)
+            if pack:
+                expanded_query = _build_pack_query(pack)
+            else:
+                expanded_query = build_query(query)
         console.print(f"[bold]Search query:[/bold] {expanded_query[:120]}...")
 
         with console.status("[bold green]Searching GEO..."):

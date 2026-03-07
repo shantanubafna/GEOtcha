@@ -1,0 +1,56 @@
+# GEOtcha Disease Pack: Metabolic Diseases
+[pack]
+name = "metabolic"
+display_name = "Metabolic Diseases"
+description = "Metabolic and endocrine disorders: diabetes, obesity, NAFLD, and more"
+
+[search]
+terms = [
+    "type 2 diabetes",
+    "type 2 diabetes mellitus",
+    "type 1 diabetes",
+    "obesity",
+    "non-alcoholic fatty liver disease",
+    "NAFLD",
+    "non-alcoholic steatohepatitis",
+    "NASH",
+    "metabolic syndrome",
+    "insulin resistance",
+]
+
+relevance_keywords = [
+    "T2D",
+    "T1D",
+    "NAFLD",
+    "NASH",
+    "metabolic",
+    "diabetes mellitus",
+    "hyperglycemia",
+    "dyslipidemia",
+    "hepatic steatosis",
+]
+
+[filters]
+expected_tissues = [
+    "liver",
+    "adipose tissue",
+    "pancreas",
+    "pancreatic islet",
+    "skeletal muscle",
+    "blood",
+    "kidney",
+    "intestine",
+    "hypothalamus",
+]
+
+expected_treatments = [
+    "metformin",
+    "insulin",
+    "semaglutide",
+    "liraglutide",
+    "pioglitazone",
+    "empagliflozin",
+    "dapagliflozin",
+    "sitagliptin",
+    "obeticholic acid",
+]

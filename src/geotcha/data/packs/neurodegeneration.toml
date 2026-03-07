@@ -1,0 +1,64 @@
+# GEOtcha Disease Pack: Neurodegeneration
+[pack]
+name = "neurodegeneration"
+display_name = "Neurodegeneration"
+description = "Neurodegenerative diseases: Alzheimer's, Parkinson's, ALS, Huntington's, and more"
+
+[search]
+terms = [
+    "Alzheimer's disease",
+    "Alzheimer disease",
+    "Parkinson's disease",
+    "Parkinson disease",
+    "amyotrophic lateral sclerosis",
+    "ALS",
+    "Huntington's disease",
+    "Huntington disease",
+    "frontotemporal dementia",
+    "multiple sclerosis",
+    "neurodegeneration",
+]
+
+relevance_keywords = [
+    "AD",
+    "PD",
+    "ALS",
+    "HD",
+    "FTD",
+    "MS",
+    "dementia",
+    "neurodegeneration",
+    "motor neuron disease",
+    "tauopathy",
+    "synucleinopathy",
+]
+
+[filters]
+expected_tissues = [
+    "brain",
+    "cerebral cortex",
+    "hippocampus",
+    "substantia nigra",
+    "cerebellum",
+    "frontal cortex",
+    "temporal cortex",
+    "spinal cord",
+    "cerebrospinal fluid",
+    "blood",
+    "motor cortex",
+    "striatum",
+    "amygdala",
+]
+
+expected_treatments = [
+    "levodopa",
+    "donepezil",
+    "memantine",
+    "riluzole",
+    "edaravone",
+    "interferon beta",
+    "natalizumab",
+    "ocrelizumab",
+    "fingolimod",
+    "glatiramer acetate",
+]

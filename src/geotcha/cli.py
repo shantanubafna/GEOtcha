@@ -23,6 +23,9 @@ console = Console()
 config_app = typer.Typer(help="Manage GEOtcha configuration.")
 app.add_typer(config_app, name="config")
 
+ml_app = typer.Typer(help="ML model management.")
+app.add_typer(ml_app, name="ml")
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -278,6 +281,10 @@ def run(
         float,
         typer.Option("--ml-threshold", help="Min ML confidence to accept prediction"),
     ] = 0.65,
+    pack: Annotated[
+        str | None,
+        typer.Option("--pack", help="Disease pack for optimized search (e.g., ibd, oncology)"),
+    ] = None,
 ) -> None:
     """Run the full pipeline: search, filter, extract, and export."""
     from geotcha.config import Settings
@@ -291,6 +298,21 @@ def run(
     if ml_mode not in ("off", "hybrid", "full"):
         console.print(f"[red]Invalid --ml-mode: {ml_mode}. Must be off, hybrid, or full.[/red]")
         raise typer.Exit(1)
+
+    # Load disease pack if specified
+    pack_data = None
+    if pack:
+        from geotcha.packs import load_pack
+
+        try:
+            pack_data = load_pack(pack)
+            console.print(
+                f"[bold]Using disease pack:[/bold] {pack_data.display_name} "
+                f"— {pack_data.description}"
+            )
+        except FileNotFoundError as e:
+            console.print(f"[red]{e}[/red]")
+            raise typer.Exit(1)
 
     try:
         settings = Settings.load(
@@ -319,6 +341,7 @@ def run(
             use_llm=llm,
             console=console,
             fmt=fmt,
+            pack=pack_data,
         )
     except GEOtchaError as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -409,6 +432,27 @@ def report(
     report_path = report_dir / "report.json"
     report_path.write_text(json.dumps(report_data, indent=2))
     console.print(f"\n[green]Report written: {report_path}[/green]")
+
+
+@app.command()
+def packs() -> None:
+    """List available disease packs."""
+    from geotcha.packs import list_packs, load_pack
+
+    available = list_packs()
+    if not available:
+        console.print("[yellow]No disease packs found.[/yellow]")
+        return
+
+    console.print("[bold]Available disease packs:[/bold]\n")
+    for name in available:
+        pack = load_pack(name)
+        console.print(f"  [bold]{name}[/bold] — {pack.display_name}")
+        console.print(f"    {pack.description}")
+        console.print(f"    Search terms: {len(pack.search_terms)}")
+        console.print()
+
+    console.print("[dim]Use --pack <name> with the run command.[/dim]")
 
 
 # ---------------------------------------------------------------------------
@@ -617,3 +661,116 @@ def config_validate() -> None:
         raise typer.Exit(1)
     else:
         console.print("[green]Configuration looks valid.[/green]")
+
+
+# ---------------------------------------------------------------------------
+# ML subcommands
+# ---------------------------------------------------------------------------
+
+
+@ml_app.command("build-index")
+def ml_build_index(
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output directory for index files"),
+    ] = None,
+    model: Annotated[
+        str | None,
+        typer.Option(help="SapBERT model name or local path"),
+    ] = None,
+    batch_size: Annotated[int, typer.Option(help="Encoding batch size")] = 64,
+) -> None:
+    """Build FAISS ontology indices for SapBERT entity linking."""
+    from geotcha.ml.loader import resolve_model_dir
+
+    try:
+        from sentence_transformers import SentenceTransformer
+    except ImportError:
+        console.print(
+            "[red]sentence-transformers not installed. "
+            "Run: pip install geotcha[ml][/red]"
+        )
+        raise typer.Exit(1)
+
+    try:
+        import faiss  # noqa: F401
+    except ImportError:
+        console.print("[red]faiss not installed. Run: pip install faiss-cpu[/red]")
+        raise typer.Exit(1)
+
+    from geotcha.harmonize.ontology import (
+        CELL_TYPE_ONTOLOGY,
+        DISEASE_ONTOLOGY,
+        TISSUE_ONTOLOGY,
+        TREATMENT_ONTOLOGY,
+    )
+    from geotcha.ml.index import ONTOLOGY_TYPES, build_index_from_ontology
+
+    index_dir = output or (resolve_model_dir(None) / "indices")
+    index_dir.mkdir(parents=True, exist_ok=True)
+
+    model_name = model or "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+    console.print(f"Loading SapBERT model: {model_name}")
+    encoder = SentenceTransformer(model_name)
+
+    ontology_map = {
+        "tissue": TISSUE_ONTOLOGY,
+        "disease": DISEASE_ONTOLOGY,
+        "cell_type": CELL_TYPE_ONTOLOGY,
+        "treatment": TREATMENT_ONTOLOGY,
+    }
+
+    for ont_type in ONTOLOGY_TYPES:
+        data = ontology_map[ont_type]
+        console.print(f"Building {ont_type} index ({len(data)} terms)...")
+        idx = build_index_from_ontology(data, ont_type, encoder, batch_size=batch_size)
+        idx.save(index_dir)
+        console.print(f"  [green]{ont_type}: {idx.size} entries[/green]")
+
+    console.print(f"\n[green]All indices saved to {index_dir}[/green]")
+
+
+@ml_app.command("download")
+def ml_download(
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output directory for index files"),
+    ] = None,
+) -> None:
+    """Download pre-built FAISS ontology indices (or build locally).
+
+    If pre-built indices are not yet available for download,
+    this falls back to building them locally.
+    """
+    console.print(
+        "[yellow]Pre-built index hosting is not yet available. "
+        "Building indices locally instead...[/yellow]"
+    )
+    ml_build_index(output=output)
+
+
+@ml_app.command("status")
+def ml_status() -> None:
+    """Show status of ML models and indices."""
+    from geotcha.ml.index import _INDEX_SUFFIX, ONTOLOGY_TYPES
+    from geotcha.ml.loader import resolve_model_dir
+
+    model_dir = resolve_model_dir(None)
+    index_dir = model_dir / "indices"
+
+    console.print(f"[bold]ML model directory:[/bold] {model_dir}")
+    console.print(f"[bold]Index directory:[/bold] {index_dir}")
+    console.print()
+
+    if not index_dir.exists():
+        console.print("[yellow]No ontology indices found.[/yellow]")
+        console.print("Run 'geotcha ml build-index' to create them.")
+        return
+
+    for ont_type in ONTOLOGY_TYPES:
+        index_path = index_dir / f"{ont_type}{_INDEX_SUFFIX}"
+        if index_path.exists():
+            size_kb = index_path.stat().st_size / 1024
+            console.print(f"  [green]✓[/green] {ont_type}: {size_kb:.0f} KB")
+        else:
+            console.print(f"  [red]✗[/red] {ont_type}: not built")

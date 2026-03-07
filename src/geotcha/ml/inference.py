@@ -19,6 +19,17 @@ _LABEL_TO_FIELD = {
     "gender": "gender",
 }
 
+# Map field names to ontology index types
+_FIELD_TO_INDEX = {
+    "disease": "disease",
+    "tissue": "tissue",
+    "cell_type": "cell_type",
+    "treatment": "treatment",
+}
+
+# Minimum similarity score for entity linking to be considered valid
+_LINK_MIN_SCORE = 0.70
+
 
 class MLHarmonizer:
     """ML-based harmonizer using GLiNER for NER and SapBERT for entity linking.
@@ -34,12 +45,14 @@ class MLHarmonizer:
         threshold: float = 0.65,
         device: str = "auto",
         review_threshold: float = 0.50,
+        index_set=None,
     ) -> None:
         self._ner = ner_model
         self._linker = linker_model
         self.threshold = threshold
         self.device = device
         self.review_threshold = review_threshold
+        self._index_set = index_set  # OntologyIndexSet or None
 
     @classmethod
     def from_config(cls, settings) -> MLHarmonizer:
@@ -49,12 +62,27 @@ class MLHarmonizer:
         device = _resolve_device(settings.ml_device)
         ner = load_ner_model(None)
         linker = load_linker(None)
+
+        # Try to load ontology indices for entity linking
+        index_set = None
+        try:
+            from geotcha.ml.index import OntologyIndexSet
+            from geotcha.ml.loader import resolve_model_dir
+
+            index_dir = resolve_model_dir(None) / "indices"
+            if index_dir.exists():
+                index_set = OntologyIndexSet.load(index_dir)
+                logger.info("Loaded ontology indices for entity linking")
+        except Exception as e:
+            logger.debug("Ontology indices not available: %s", e)
+
         return cls(
             ner_model=ner,
             linker_model=linker,
             threshold=settings.ml_threshold,
             device=device,
             review_threshold=settings.ml_review_threshold,
+            index_set=index_set,
         )
 
     def _needs_ml(self, record, field: str) -> bool:
@@ -105,13 +133,41 @@ class MLHarmonizer:
     def _link_entity(self, text: str, field: str) -> tuple[str | None, float]:
         """Link an entity string to an ontology term using SapBERT.
 
-        Returns (ontology_id, confidence). Returns (None, 0.0) if linking fails.
+        Encodes the entity text with SapBERT and searches the corresponding
+        FAISS ontology index for the nearest neighbor.
+
+        Returns (ontology_id, confidence). Returns (None, 0.0) if linking fails
+        or if no index is available for this field.
         """
         if self._linker is None:
             return None, 0.0
-        # Placeholder: full linking requires pre-built ontology index
-        # For now, return None -- will be implemented when ontology indices are built
-        return None, 0.0
+
+        index_type = _FIELD_TO_INDEX.get(field)
+        if not index_type or self._index_set is None:
+            return None, 0.0
+
+        index = self._index_set.get(index_type)
+        if index is None:
+            return None, 0.0
+
+        try:
+            import numpy as np
+
+            embedding = self._linker.encode(
+                [text], show_progress_bar=False, normalize_embeddings=True
+            )
+            embedding = np.array(embedding, dtype=np.float32)
+            results = index.search(embedding, top_k=1)
+
+            if results:
+                _name, ontology_id, score = results[0]
+                if score >= _LINK_MIN_SCORE:
+                    return ontology_id, float(score)
+
+            return None, 0.0
+        except Exception as e:
+            logger.warning("Entity linking failed for '%s' (%s): %s", text, field, e)
+            return None, 0.0
 
     def harmonize_gsm(self, record: GSMRecord) -> GSMRecord:
         """Apply ML harmonization to a GSM record.

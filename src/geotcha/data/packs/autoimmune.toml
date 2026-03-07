@@ -1,0 +1,63 @@
+# GEOtcha Disease Pack: Autoimmune Diseases
+[pack]
+name = "autoimmune"
+display_name = "Autoimmune Diseases"
+description = "Autoimmune and autoinflammatory conditions: RA, SLE, psoriasis, and more"
+
+[search]
+terms = [
+    "rheumatoid arthritis",
+    "systemic lupus erythematosus",
+    "lupus",
+    "psoriasis",
+    "psoriatic arthritis",
+    "ankylosing spondylitis",
+    "Sjogren's syndrome",
+    "scleroderma",
+    "systemic sclerosis",
+    "myasthenia gravis",
+    "autoimmune",
+]
+
+relevance_keywords = [
+    "RA",
+    "SLE",
+    "PsA",
+    "AS",
+    "autoimmune",
+    "autoantibody",
+    "anti-CCP",
+    "anti-dsDNA",
+    "immunosuppression",
+]
+
+[filters]
+expected_tissues = [
+    "synovial membrane",
+    "skin",
+    "blood",
+    "joint",
+    "kidney",
+    "salivary gland",
+    "lung",
+    "muscle",
+    "lymph node",
+]
+
+expected_treatments = [
+    "methotrexate",
+    "hydroxychloroquine",
+    "rituximab",
+    "abatacept",
+    "tofacitinib",
+    "baricitinib",
+    "adalimumab",
+    "etanercept",
+    "infliximab",
+    "secukinumab",
+    "ustekinumab",
+    "mycophenolate",
+    "azathioprine",
+    "cyclophosphamide",
+    "belimumab",
+]

@@ -1,0 +1,60 @@
+# GEOtcha Disease Pack: Inflammatory Bowel Disease (IBD)
+[pack]
+name = "ibd"
+display_name = "Inflammatory Bowel Disease"
+description = "IBD, Crohn's disease, and ulcerative colitis"
+
+[search]
+# Primary search terms (used in Entrez query)
+terms = [
+    "inflammatory bowel disease",
+    "ulcerative colitis",
+    "Crohn's disease",
+    "Crohn disease",
+    "IBD",
+]
+
+# Additional relevance keywords (for post-search filtering)
+relevance_keywords = [
+    "UC",
+    "CD",
+    "colitis",
+    "ileitis",
+    "pouchitis",
+]
+
+[filters]
+# Tissues commonly relevant to IBD studies
+expected_tissues = [
+    "colon",
+    "ileum",
+    "rectum",
+    "sigmoid colon",
+    "ascending colon",
+    "descending colon",
+    "transverse colon",
+    "cecum",
+    "intestine",
+    "large intestine",
+    "small intestine",
+    "mucosa",
+    "blood",
+]
+
+# Treatments commonly studied in IBD
+expected_treatments = [
+    "infliximab",
+    "adalimumab",
+    "vedolizumab",
+    "ustekinumab",
+    "tofacitinib",
+    "azathioprine",
+    "mesalamine",
+    "corticosteroid",
+    "prednisolone",
+    "budesonide",
+    "methotrexate",
+    "6-mercaptopurine",
+    "cyclosporine",
+    "anti-TNF",
+]

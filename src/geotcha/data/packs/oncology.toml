@@ -1,0 +1,72 @@
+# GEOtcha Disease Pack: Oncology
+[pack]
+name = "oncology"
+display_name = "Oncology"
+description = "Cancer and tumor studies across major cancer types"
+
+[search]
+terms = [
+    "cancer",
+    "carcinoma",
+    "tumor",
+    "neoplasm",
+    "malignancy",
+    "leukemia",
+    "lymphoma",
+    "melanoma",
+    "sarcoma",
+    "glioblastoma",
+]
+
+relevance_keywords = [
+    "oncology",
+    "metastasis",
+    "metastatic",
+    "chemotherapy",
+    "immunotherapy",
+    "checkpoint inhibitor",
+    "targeted therapy",
+]
+
+[filters]
+expected_tissues = [
+    "breast",
+    "lung",
+    "colon",
+    "liver",
+    "brain",
+    "skin",
+    "prostate",
+    "ovary",
+    "kidney",
+    "pancreas",
+    "stomach",
+    "esophagus",
+    "thyroid",
+    "bladder",
+    "blood",
+    "bone marrow",
+    "lymph node",
+]
+
+expected_treatments = [
+    "cisplatin",
+    "carboplatin",
+    "doxorubicin",
+    "paclitaxel",
+    "docetaxel",
+    "gemcitabine",
+    "5-fluorouracil",
+    "pembrolizumab",
+    "nivolumab",
+    "ipilimumab",
+    "atezolizumab",
+    "trastuzumab",
+    "rituximab",
+    "imatinib",
+    "erlotinib",
+    "sorafenib",
+    "bevacizumab",
+    "tamoxifen",
+    "letrozole",
+]

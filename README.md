@@ -18,7 +18,7 @@ pip install geotcha
 With optional extras:
 
 ```bash
-pip install geotcha[ml]       # ML harmonization (GLiNER + SapBERT)
+pip install geotcha[ml]       # ML harmonization (GLiNER + SapBERT + FAISS)
 pip install geotcha[parquet]  # Parquet export support
 pip install geotcha[llm]      # LLM harmonization
 ```
@@ -68,14 +68,32 @@ Parquet requires `pip install geotcha[parquet]`.
 geotcha run "IBD" --subset 5 --include-scrna
 ```
 
-### With ML harmonization (zero-shot NER)
+### Disease packs
+
+```bash
+# List available packs
+geotcha packs
+
+# Use a pack for optimized search
+geotcha run "IBD" --pack ibd --harmonize
+geotcha run "breast cancer" --pack oncology --harmonize
+```
+
+Available packs: `ibd`, `oncology`, `neurodegeneration`, `autoimmune`, `metabolic`.
+
+### With ML harmonization (zero-shot NER + entity linking)
 
 ```bash
 pip install geotcha[ml]
+
+# Build FAISS ontology indices (one-time)
+geotcha ml build-index
+
+# Run with ML
 geotcha run "IBD" --harmonize --ml-mode hybrid
 ```
 
-ML fills in missing or low-confidence fields using GLiNER biomedical NER. Use `--ml-mode full` to let ML run on all fields.
+ML fills in missing or low-confidence fields using GLiNER biomedical NER and SapBERT entity linking. Use `--ml-mode full` to let ML run on all fields.
 
 ### With LLM harmonization
 
@@ -272,7 +290,8 @@ python scripts/build_ontologies.py
 
 ### 2. ML (`--ml-mode hybrid` or `--ml-mode full`)
 - **GLiNER-BioMed**: zero-shot biomedical NER for disease, tissue, cell type, treatment, gender
-- **SapBERT**: entity linking to UBERON/DOID ontology terms (scaffold — index building deferred)
+- **SapBERT + FAISS**: entity linking to UBERON/DOID/CL/ChEBI ontology terms via pre-built FAISS indices
+- Build indices once with `geotcha ml build-index`, check status with `geotcha ml status`
 - In `hybrid` mode, ML only fills fields where rules produced low confidence or no value
 - Low-confidence ML predictions flag records with `needs_review=True`
 
@@ -281,6 +300,18 @@ python scripts/build_ontologies.py
 - Supports OpenAI, Anthropic, and Ollama providers
 
 Each field tracks provenance: `_harmonized`, `_source` (rule/ml/llm), `_confidence`, and `_ontology_id`.
+
+## Documentation
+
+Full documentation: install `pip install geotcha[docs]` and run `mkdocs serve`, or see the `docs/` directory:
+
+- [Getting Started](docs/getting-started.md)
+- [CLI Reference](docs/cli-reference.md)
+- [Python SDK](docs/sdk-reference.md)
+- [Harmonization Guide](docs/harmonization.md)
+- [Disease Packs](docs/disease-packs.md)
+- [ML & LLM](docs/ml-llm.md)
+- [Extending Ontologies](docs/extending-ontologies.md)
 
 ## License
 
