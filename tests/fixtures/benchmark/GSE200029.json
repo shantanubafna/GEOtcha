@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200029",
+  "input": {
+    "title": "Celiac disease duodenal transcriptome",
+    "summary": "RNA-seq of duodenal biopsies from celiac patients",
+    "tissue": "duodenum",
+    "disease": "celiac disease"
+  },
+  "expected": {
+    "tissue_harmonized": "duodenum",
+    "tissue_ontology_id": "UBERON:0002114",
+    "disease_harmonized": "celiac disease",
+    "disease_ontology_id": "DOID:10608"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000029",
+      "input": {
+        "tissue": "duodenum",
+        "disease": "celiac disease",
+        "gender": "F",
+        "age": "33 years"
+      },
+      "expected": {
+        "tissue_harmonized": "duodenum",
+        "disease_harmonized": "celiac disease",
+        "gender_harmonized": "female",
+        "age_harmonized": "33"
+      }
+    }
+  ]
+}

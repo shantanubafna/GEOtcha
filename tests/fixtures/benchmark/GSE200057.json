@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200057",
+  "input": {
+    "title": "Hepatitis C liver RNA-seq",
+    "summary": "RNA-seq of liver biopsies from HCV patients",
+    "tissue": "liver",
+    "disease": "hepatitis C"
+  },
+  "expected": {
+    "tissue_harmonized": "liver",
+    "tissue_ontology_id": "UBERON:0002107",
+    "disease_harmonized": "hepatitis C",
+    "disease_ontology_id": "DOID:1883"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000057",
+      "input": {
+        "tissue": "liver",
+        "disease": "hepatitis C",
+        "gender": "M",
+        "age": "48 years"
+      },
+      "expected": {
+        "tissue_harmonized": "liver",
+        "disease_harmonized": "hepatitis C",
+        "gender_harmonized": "male",
+        "age_harmonized": "48"
+      }
+    }
+  ]
+}

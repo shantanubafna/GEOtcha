@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200079",
+  "input": {
+    "title": "JAK inhibitor treatment in RA",
+    "summary": "RNA-seq of blood from RA patients treated with tofacitinib",
+    "tissue": "peripheral blood",
+    "disease": "rheumatoid arthritis",
+    "treatment": "tofacitinib"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "rheumatoid arthritis",
+    "disease_ontology_id": "DOID:7148",
+    "treatment_harmonized": "tofacitinib"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000079",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "rheumatoid arthritis",
+        "treatment": "tofacitinib",
+        "gender": "F",
+        "age": "53 years"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "rheumatoid arthritis",
+        "treatment_harmonized": "tofacitinib",
+        "gender_harmonized": "female",
+        "age_harmonized": "53"
+      }
+    }
+  ]
+}

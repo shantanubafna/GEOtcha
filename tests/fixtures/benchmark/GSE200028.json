@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200028",
+  "input": {
+    "title": "Type 1 diabetes pancreatic islet RNA-seq",
+    "summary": "RNA-seq of pancreatic islets from T1D donors",
+    "tissue": "pancreas",
+    "disease": "type 1 diabetes mellitus"
+  },
+  "expected": {
+    "tissue_harmonized": "pancreas",
+    "tissue_ontology_id": "UBERON:0001264",
+    "disease_harmonized": "type 1 diabetes mellitus",
+    "disease_ontology_id": "DOID:9744"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000028",
+      "input": {
+        "tissue": "pancreas",
+        "disease": "type 1 diabetes mellitus",
+        "gender": "M",
+        "age": "22 years"
+      },
+      "expected": {
+        "tissue_harmonized": "pancreas",
+        "disease_harmonized": "type 1 diabetes mellitus",
+        "gender_harmonized": "male",
+        "age_harmonized": "22"
+      }
+    }
+  ]
+}

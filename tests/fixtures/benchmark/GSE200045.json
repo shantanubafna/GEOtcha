@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200045",
+  "input": {
+    "title": "Liver cirrhosis transcriptomics",
+    "summary": "RNA-seq of liver tissue from cirrhosis patients",
+    "tissue": "liver",
+    "disease": "liver cirrhosis"
+  },
+  "expected": {
+    "tissue_harmonized": "liver",
+    "tissue_ontology_id": "UBERON:0002107",
+    "disease_harmonized": "liver cirrhosis",
+    "disease_ontology_id": "DOID:5082"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000045",
+      "input": {
+        "tissue": "liver",
+        "disease": "liver cirrhosis",
+        "gender": "M",
+        "age": "58 years",
+        "cell_type": "hepatocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "liver",
+        "disease_harmonized": "liver cirrhosis",
+        "gender_harmonized": "male",
+        "age_harmonized": "58",
+        "cell_type_harmonized": "hepatocyte"
+      }
+    }
+  ]
+}

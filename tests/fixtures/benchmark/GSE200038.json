@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200038",
+  "input": {
+    "title": "Huntington disease striatum RNA-seq",
+    "summary": "RNA-seq of caudate nucleus from HD patients",
+    "tissue": "brain",
+    "disease": "Huntington's disease"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "Huntington's disease",
+    "disease_ontology_id": "DOID:12858"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000038",
+      "input": {
+        "tissue": "brain",
+        "disease": "Huntington's disease",
+        "gender": "M",
+        "age": "52 years"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "Huntington's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "52"
+      }
+    }
+  ]
+}

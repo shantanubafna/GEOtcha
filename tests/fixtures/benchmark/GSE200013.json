@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200013",
+  "input": {
+    "title": "Diffuse large B-cell lymphoma profiling",
+    "summary": "RNA-seq of DLBCL biopsies",
+    "tissue": "lymph node",
+    "disease": "diffuse large B-cell lymphoma",
+    "treatment": "rituximab"
+  },
+  "expected": {
+    "tissue_harmonized": "lymph node",
+    "tissue_ontology_id": "UBERON:0000029",
+    "disease_harmonized": "diffuse large B-cell lymphoma",
+    "disease_ontology_id": "DOID:0050745",
+    "treatment_harmonized": "rituximab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000013",
+      "input": {
+        "tissue": "lymph node",
+        "disease": "diffuse large B-cell lymphoma",
+        "gender": "F",
+        "age": "54 years",
+        "cell_type": "B cell"
+      },
+      "expected": {
+        "tissue_harmonized": "lymph node",
+        "disease_harmonized": "diffuse large B-cell lymphoma",
+        "gender_harmonized": "female",
+        "age_harmonized": "54",
+        "cell_type_harmonized": "B cell"
+      }
+    }
+  ]
+}

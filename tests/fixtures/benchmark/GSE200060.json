@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200060",
+  "input": {
+    "title": "CD ileum biopsy study",
+    "summary": "RNA-seq from ileal biopsies in Crohn's disease",
+    "tissue": "ileum",
+    "disease": "CD"
+  },
+  "expected": {
+    "tissue_harmonized": "ileum",
+    "tissue_ontology_id": "UBERON:0002116",
+    "disease_harmonized": "Crohn's disease",
+    "disease_ontology_id": "DOID:8778"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000060",
+      "input": {
+        "tissue": "ileum",
+        "disease": "crohns",
+        "gender": "F",
+        "age": "26 years"
+      },
+      "expected": {
+        "tissue_harmonized": "ileum",
+        "disease_harmonized": "Crohn's disease",
+        "gender_harmonized": "female",
+        "age_harmonized": "26"
+      }
+    }
+  ]
+}

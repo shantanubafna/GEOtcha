@@ -12,8 +12,10 @@ from geotcha.extract.fields import (
     extract_responder_from_characteristics,
     extract_timepoint,
     extract_timepoint_from_characteristics,
+    extract_tissue_from_characteristics,
     extract_treatment_from_characteristics,
     parse_characteristics,
+    parse_source_name,
 )
 from geotcha.extract.gsm_parser import _filter_human_rnaseq, _is_single_cell_sample
 from geotcha.models import GSMRecord
@@ -324,3 +326,104 @@ class TestExtractDiseaseStatus:
         status, confidence = extract_disease_status_from_characteristics(chars)
         assert status is None
         assert confidence == 0.0
+
+
+class TestExtractTissueFromCharacteristics:
+    def test_tissue_key(self):
+        chars = {"tissue": "colon"}
+        assert extract_tissue_from_characteristics(chars) == "colon"
+
+    def test_tissue_type_key(self):
+        chars = {"tissue type": "liver biopsy"}
+        assert extract_tissue_from_characteristics(chars) == "liver biopsy"
+
+    def test_organ_key(self):
+        chars = {"organ": "lung"}
+        assert extract_tissue_from_characteristics(chars) == "lung"
+
+    def test_body_site_key(self):
+        chars = {"body site": "sigmoid colon"}
+        assert extract_tissue_from_characteristics(chars) == "sigmoid colon"
+
+    def test_no_tissue_key(self):
+        chars = {"disease": "UC", "gender": "male"}
+        assert extract_tissue_from_characteristics(chars) is None
+
+
+class TestExpandedDiseaseKeys:
+    def test_disease_type_key(self):
+        chars = {"disease type": "melanoma"}
+        assert extract_disease_from_characteristics(chars) == "melanoma"
+
+    def test_tumor_type_key(self):
+        chars = {"tumor type": "glioblastoma"}
+        assert extract_disease_from_characteristics(chars) == "glioblastoma"
+
+    def test_cancer_type_key(self):
+        chars = {"cancer type": "breast cancer"}
+        assert extract_disease_from_characteristics(chars) == "breast cancer"
+
+    def test_clinical_diagnosis_key(self):
+        chars = {"clinical diagnosis": "Crohn's disease"}
+        assert extract_disease_from_characteristics(chars) == "Crohn's disease"
+
+    def test_phenotype_key(self):
+        chars = {"phenotype": "type 2 diabetes"}
+        assert extract_disease_from_characteristics(chars) == "type 2 diabetes"
+
+
+class TestExpandedTreatmentKeys:
+    def test_intervention_key(self):
+        chars = {"intervention": "pembrolizumab"}
+        assert extract_treatment_from_characteristics(chars) == "pembrolizumab"
+
+    def test_drug_name_key(self):
+        chars = {"drug name": "methotrexate 15mg"}
+        assert extract_treatment_from_characteristics(chars) == "methotrexate 15mg"
+
+    def test_exposure_key(self):
+        chars = {"exposure": "LPS 100ng/ml"}
+        assert extract_treatment_from_characteristics(chars) == "LPS 100ng/ml"
+
+
+class TestParseSourceName:
+    def test_tissue_only(self):
+        result = parse_source_name("colon")
+        assert result.get("tissue") == "colon"
+
+    def test_multi_segment(self):
+        result = parse_source_name("colon, ulcerative colitis, male")
+        assert result.get("tissue") == "colon"
+        assert result.get("disease") == "ulcerative colitis"
+        assert result.get("gender") == "male"
+
+    def test_age_detection(self):
+        result = parse_source_name("liver, 45y")
+        assert result.get("tissue") is not None
+        assert result.get("age") == "45"
+
+    def test_semicolon_delimiter(self):
+        result = parse_source_name("lung; breast cancer")
+        assert result.get("tissue") == "lung"
+        assert result.get("disease") is not None
+
+    def test_empty_string(self):
+        assert parse_source_name("") == {}
+
+    def test_none(self):
+        assert parse_source_name(None) == {}
+
+    def test_treatment_segment(self):
+        result = parse_source_name("blood, infliximab")
+        assert result.get("tissue") is not None
+        assert result.get("treatment") == "infliximab"
+
+    def test_cell_type_segment(self):
+        result = parse_source_name("T cell, blood")
+        assert result.get("cell_type") is not None
+
+    def test_pipe_delimiter(self):
+        result = parse_source_name("colon | male | 30y")
+        assert result.get("tissue") == "colon"
+        assert result.get("gender") == "male"
+        assert result.get("age") == "30"

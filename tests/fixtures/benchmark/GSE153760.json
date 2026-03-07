@@ -8,8 +8,9 @@
     "treatment": "trastuzumab"
   },
   "expected": {
-    "tissue_harmonized": "breast",
-    "treatment_harmonized": "trastuzumab"
+    "tissue_harmonized": "mammary gland",
+    "treatment_harmonized": "trastuzumab",
+    "tissue_ontology_id": "UBERON:0001911"
   },
   "samples": [
     {

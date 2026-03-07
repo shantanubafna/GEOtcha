@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200026",
+  "input": {
+    "title": "Atopic dermatitis skin transcriptome",
+    "summary": "RNA-seq of skin lesions from AD patients",
+    "tissue": "skin",
+    "disease": "atopic dermatitis",
+    "treatment": "dexamethasone"
+  },
+  "expected": {
+    "tissue_harmonized": "skin of body",
+    "tissue_ontology_id": "UBERON:0002097",
+    "disease_harmonized": "atopic dermatitis",
+    "disease_ontology_id": "DOID:3310",
+    "treatment_harmonized": "dexamethasone"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000026",
+      "input": {
+        "tissue": "skin",
+        "disease": "atopic dermatitis",
+        "gender": "M",
+        "age": "24 years",
+        "cell_type": "keratinocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "skin of body",
+        "disease_harmonized": "atopic dermatitis",
+        "gender_harmonized": "male",
+        "age_harmonized": "24",
+        "cell_type_harmonized": "keratinocyte"
+      }
+    }
+  ]
+}

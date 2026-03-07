@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200036",
+  "input": {
+    "title": "Schizophrenia cortical RNA-seq",
+    "summary": "RNA-seq of prefrontal cortex in schizophrenia",
+    "tissue": "cerebral cortex",
+    "disease": "schizophrenia"
+  },
+  "expected": {
+    "tissue_harmonized": "cerebral cortex",
+    "tissue_ontology_id": "UBERON:0000956",
+    "disease_harmonized": "schizophrenia",
+    "disease_ontology_id": "DOID:5419"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000036",
+      "input": {
+        "tissue": "cerebral cortex",
+        "disease": "schizophrenia",
+        "gender": "M",
+        "age": "44 years"
+      },
+      "expected": {
+        "tissue_harmonized": "cerebral cortex",
+        "disease_harmonized": "schizophrenia",
+        "gender_harmonized": "male",
+        "age_harmonized": "44"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200051",
+  "input": {
+    "title": "COVID-19 blood transcriptome",
+    "summary": "RNA-seq of whole blood from COVID-19 patients",
+    "tissue": "whole blood",
+    "disease": "COVID-19"
+  },
+  "expected": {
+    "tissue_harmonized": "blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "COVID-19",
+    "disease_ontology_id": "DOID:0080600"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000051",
+      "input": {
+        "tissue": "whole blood",
+        "disease": "COVID-19",
+        "gender": "M",
+        "age": "55 years",
+        "cell_type": "monocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "COVID-19",
+        "gender_harmonized": "male",
+        "age_harmonized": "55",
+        "cell_type_harmonized": "monocyte"
+      }
+    }
+  ]
+}

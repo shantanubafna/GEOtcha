@@ -21,8 +21,10 @@ from geotcha.extract.fields import (
     extract_sample_acquisition_from_characteristics,
     extract_timepoint,
     extract_timepoint_from_characteristics,
+    extract_tissue_from_characteristics,
     extract_treatment_from_characteristics,
     parse_characteristics,
+    parse_source_name,
 )
 from geotcha.models import GSMRecord
 
@@ -63,8 +65,8 @@ def parse_gsm_samples(
         age = extract_age_from_characteristics(characteristics)
         disease = extract_disease_from_characteristics(characteristics)
 
-        # Tissue: try characteristics first, then source_name, then free text
-        tissue = characteristics.get("tissue")
+        # Tissue: try characteristic keys, then keyword detection, then source_name
+        tissue = extract_tissue_from_characteristics(characteristics)
         if not tissue:
             tissue = detect_tissue(source) or detect_tissue(combined_text)
 
@@ -85,6 +87,24 @@ def parse_gsm_samples(
 
         # Cell type from characteristics
         cell_type = extract_cell_type_from_characteristics(characteristics)
+
+        # Fill gaps from source_name parsing (structured segments)
+        if source and any(
+            f is None for f in [tissue, disease, cell_type, treatment]
+        ):
+            source_fields = parse_source_name(source)
+            if not tissue and "tissue" in source_fields:
+                tissue = source_fields["tissue"]
+            if not disease and "disease" in source_fields:
+                disease = source_fields["disease"]
+            if not cell_type and "cell_type" in source_fields:
+                cell_type = source_fields["cell_type"]
+            if not treatment and "treatment" in source_fields:
+                treatment = source_fields["treatment"]
+            if not gender and "gender" in source_fields:
+                gender = source_fields["gender"]
+            if not age and "age" in source_fields:
+                age = source_fields["age"]
 
         # Disease status
         disease_status, _ = extract_disease_status_from_characteristics(characteristics)

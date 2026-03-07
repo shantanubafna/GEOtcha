@@ -1,0 +1,29 @@
+{
+  "gse_id": "GSE200068",
+  "input": {
+    "title": "Regulatory T cell transcriptomics in autoimmunity",
+    "summary": "RNA-seq of sorted Tregs from autoimmune patients",
+    "tissue": "peripheral blood"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000068",
+      "input": {
+        "tissue": "peripheral blood",
+        "cell_type": "Treg",
+        "gender": "F",
+        "age": "42 years"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "cell_type_harmonized": "regulatory T cell",
+        "gender_harmonized": "female",
+        "age_harmonized": "42"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200024",
+  "input": {
+    "title": "Sjogren syndrome salivary gland RNA-seq",
+    "summary": "RNA-seq of minor salivary gland biopsies from Sjogren patients",
+    "tissue": "salivary gland",
+    "disease": "Sjogren's syndrome"
+  },
+  "expected": {
+    "tissue_harmonized": "duct of salivary gland",
+    "tissue_ontology_id": "UBERON:0001044",
+    "disease_harmonized": "Sjogren's syndrome",
+    "disease_ontology_id": "DOID:12894"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000024",
+      "input": {
+        "tissue": "salivary gland",
+        "disease": "Sjogren's syndrome",
+        "gender": "F",
+        "age": "52 years"
+      },
+      "expected": {
+        "tissue_harmonized": "duct of salivary gland",
+        "disease_harmonized": "Sjogren's syndrome",
+        "gender_harmonized": "female",
+        "age_harmonized": "52"
+      }
+    }
+  ]
+}

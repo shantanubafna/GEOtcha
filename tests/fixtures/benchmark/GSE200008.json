@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200008",
+  "input": {
+    "title": "Hepatocellular carcinoma transcriptome",
+    "summary": "RNA-seq of HCC and adjacent normal liver",
+    "tissue": "liver",
+    "disease": "hepatocellular carcinoma",
+    "treatment": "sorafenib"
+  },
+  "expected": {
+    "tissue_harmonized": "liver",
+    "tissue_ontology_id": "UBERON:0002107",
+    "disease_harmonized": "hepatocellular carcinoma",
+    "disease_ontology_id": "DOID:684",
+    "treatment_harmonized": "sorafenib"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000008",
+      "input": {
+        "tissue": "liver",
+        "disease": "hepatocellular carcinoma",
+        "gender": "M",
+        "age": "63 years",
+        "cell_type": "hepatocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "liver",
+        "disease_harmonized": "hepatocellular carcinoma",
+        "gender_harmonized": "male",
+        "age_harmonized": "63",
+        "cell_type_harmonized": "hepatocyte"
+      }
+    }
+  ]
+}

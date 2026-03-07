@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200015",
+  "input": {
+    "title": "Esophageal cancer expression profiling",
+    "summary": "RNA-seq of esophageal squamous cell carcinoma",
+    "tissue": "esophagus",
+    "disease": "esophageal cancer"
+  },
+  "expected": {
+    "tissue_harmonized": "esophagus",
+    "tissue_ontology_id": "UBERON:0001043",
+    "disease_harmonized": "esophageal cancer",
+    "disease_ontology_id": "DOID:5041"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000015",
+      "input": {
+        "tissue": "esophagus",
+        "disease": "esophageal cancer",
+        "gender": "M",
+        "age": "64 years"
+      },
+      "expected": {
+        "tissue_harmonized": "esophagus",
+        "disease_harmonized": "esophageal cancer",
+        "gender_harmonized": "male",
+        "age_harmonized": "64"
+      }
+    }
+  ]
+}

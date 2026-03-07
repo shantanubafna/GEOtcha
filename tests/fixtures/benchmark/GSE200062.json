@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200062",
+  "input": {
+    "title": "IBD anti-TNF study with brand drug name",
+    "summary": "RNA-seq of colon from IBD patients on Remicade",
+    "tissue": "colon",
+    "disease": "IBD",
+    "treatment": "Remicade"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "inflammatory bowel disease",
+    "disease_ontology_id": "DOID:0050589",
+    "treatment_harmonized": "infliximab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000062",
+      "input": {
+        "tissue": "colon",
+        "disease": "IBD",
+        "treatment": "Remicade"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "inflammatory bowel disease",
+        "treatment_harmonized": "infliximab"
+      }
+    }
+  ]
+}

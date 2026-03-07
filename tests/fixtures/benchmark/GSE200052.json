@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200052",
+  "input": {
+    "title": "Tuberculosis lung transcriptome",
+    "summary": "RNA-seq of lung tissue from TB patients",
+    "tissue": "lung",
+    "disease": "tuberculosis"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "tuberculosis",
+    "disease_ontology_id": "DOID:399"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000052",
+      "input": {
+        "tissue": "lung",
+        "disease": "tuberculosis",
+        "gender": "M",
+        "age": "42 years",
+        "cell_type": "macrophage"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "tuberculosis",
+        "gender_harmonized": "male",
+        "age_harmonized": "42",
+        "cell_type_harmonized": "macrophage"
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "gse_id": "GSE200004",
+  "input": {
+    "title": "Melanoma immunotherapy response",
+    "summary": "RNA-seq of melanoma biopsies pre and post nivolumab",
+    "tissue": "skin",
+    "disease": "melanoma",
+    "treatment": "nivolumab",
+    "timepoint": "Week 4"
+  },
+  "expected": {
+    "tissue_harmonized": "skin of body",
+    "tissue_ontology_id": "UBERON:0002097",
+    "disease_harmonized": "melanoma",
+    "disease_ontology_id": "DOID:1909",
+    "treatment_harmonized": "nivolumab",
+    "timepoint_harmonized": "W4"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000004",
+      "input": {
+        "tissue": "skin",
+        "disease": "melanoma",
+        "gender": "F",
+        "age": "59 years",
+        "treatment": "nivolumab",
+        "timepoint": "Week 4",
+        "cell_type": "T cell"
+      },
+      "expected": {
+        "tissue_harmonized": "skin of body",
+        "disease_harmonized": "melanoma",
+        "gender_harmonized": "female",
+        "age_harmonized": "59",
+        "treatment_harmonized": "nivolumab",
+        "timepoint_harmonized": "W4",
+        "cell_type_harmonized": "T cell"
+      }
+    }
+  ]
+}

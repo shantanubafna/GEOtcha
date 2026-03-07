@@ -1,0 +1,27 @@
+{
+  "gse_id": "GSE200074",
+  "input": {
+    "title": "Adrenal gland adenoma RNA-seq",
+    "summary": "RNA-seq of adrenal cortical adenoma",
+    "tissue": "adrenal gland"
+  },
+  "expected": {
+    "tissue_harmonized": "adrenal gland",
+    "tissue_ontology_id": "UBERON:0002369"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000074",
+      "input": {
+        "tissue": "adrenal gland",
+        "gender": "F",
+        "age": "49 years"
+      },
+      "expected": {
+        "tissue_harmonized": "adrenal gland",
+        "gender_harmonized": "female",
+        "age_harmonized": "49"
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "gse_id": "GSE200042",
+  "input": {
+    "title": "Traumatic brain injury RNA-seq",
+    "summary": "RNA-seq of cortex after TBI",
+    "tissue": "cerebral cortex",
+    "disease": "traumatic brain injury"
+  },
+  "expected": {
+    "tissue_harmonized": "cerebral cortex",
+    "tissue_ontology_id": "UBERON:0000956"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000042",
+      "input": {
+        "tissue": "cerebral cortex",
+        "gender": "M",
+        "age": "31 years"
+      },
+      "expected": {
+        "tissue_harmonized": "cerebral cortex",
+        "gender_harmonized": "male",
+        "age_harmonized": "31"
+      }
+    }
+  ]
+}

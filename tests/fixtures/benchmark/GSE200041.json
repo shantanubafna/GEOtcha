@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200041",
+  "input": {
+    "title": "Stroke brain tissue RNA-seq",
+    "summary": "RNA-seq of peri-infarct brain tissue from stroke patients",
+    "tissue": "brain",
+    "disease": "stroke"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "stroke",
+    "disease_ontology_id": "DOID:6713"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000041",
+      "input": {
+        "tissue": "brain",
+        "disease": "stroke",
+        "gender": "M",
+        "age": "67 years"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "stroke",
+        "gender_harmonized": "male",
+        "age_harmonized": "67"
+      }
+    }
+  ]
+}

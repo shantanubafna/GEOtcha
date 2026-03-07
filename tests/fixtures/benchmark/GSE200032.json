@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200032",
+  "input": {
+    "title": "Primary biliary cholangitis liver RNA-seq",
+    "summary": "RNA-seq of liver biopsies from PBC patients",
+    "tissue": "liver",
+    "disease": "primary biliary cholangitis"
+  },
+  "expected": {
+    "tissue_harmonized": "liver",
+    "tissue_ontology_id": "UBERON:0002107",
+    "disease_harmonized": "primary biliary cholangitis",
+    "disease_ontology_id": "DOID:12236"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000032",
+      "input": {
+        "tissue": "liver",
+        "disease": "primary biliary cholangitis",
+        "gender": "F",
+        "age": "56 years"
+      },
+      "expected": {
+        "tissue_harmonized": "liver",
+        "disease_harmonized": "primary biliary cholangitis",
+        "gender_harmonized": "female",
+        "age_harmonized": "56"
+      }
+    }
+  ]
+}

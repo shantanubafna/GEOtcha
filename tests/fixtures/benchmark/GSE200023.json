@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200023",
+  "input": {
+    "title": "Ankylosing spondylitis spinal transcriptome",
+    "summary": "RNA-seq of AS patient blood samples",
+    "tissue": "peripheral blood",
+    "disease": "ankylosing spondylitis"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "ankylosing spondylitis",
+    "disease_ontology_id": "DOID:7147"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000023",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "ankylosing spondylitis",
+        "gender": "M",
+        "age": "38 years"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "ankylosing spondylitis",
+        "gender_harmonized": "male",
+        "age_harmonized": "38"
+      }
+    }
+  ]
+}

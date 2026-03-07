@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200043",
+  "input": {
+    "title": "Type 2 diabetes adipose tissue RNA-seq",
+    "summary": "RNA-seq of adipose tissue from T2D patients",
+    "tissue": "adipose tissue",
+    "disease": "type 2 diabetes mellitus",
+    "treatment": "metformin"
+  },
+  "expected": {
+    "tissue_harmonized": "adipose tissue",
+    "tissue_ontology_id": "UBERON:0001013",
+    "disease_harmonized": "type 2 diabetes mellitus",
+    "disease_ontology_id": "DOID:9352",
+    "treatment_harmonized": "metformin"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000043",
+      "input": {
+        "tissue": "adipose tissue",
+        "disease": "T2D",
+        "gender": "M",
+        "age": "55 years",
+        "treatment": "metformin"
+      },
+      "expected": {
+        "tissue_harmonized": "adipose tissue",
+        "disease_harmonized": "type 2 diabetes mellitus",
+        "gender_harmonized": "male",
+        "age_harmonized": "55",
+        "treatment_harmonized": "metformin"
+      }
+    }
+  ]
+}

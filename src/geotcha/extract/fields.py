@@ -59,6 +59,8 @@ TREATMENT_CHAR_KEYS = [
     "treatment", "drug", "therapy", "agent", "medication",
     "anti-tnf", "biologic", "compound", "stimulus", "stimulation",
     "dose", "dosage",
+    "treatment protocol", "intervention", "drug name", "treated with",
+    "exposure", "chemical", "inhibitor", "agonist", "antagonist",
 ]
 
 # Characteristic keys that indicate timepoint
@@ -87,6 +89,15 @@ SEVERITY_CHAR_KEYS = [
 CELL_TYPE_CHAR_KEYS = [
     "cell type", "cell_type", "cell lineage", "cell population",
     "cell subtype", "sorted cell", "facs",
+    "cell marker", "sorted population", "flow sorted", "cell class",
+    "cell identity", "cell subset", "cell phenotype",
+]
+
+# Characteristic keys for tissue
+TISSUE_CHAR_KEYS = [
+    "tissue", "tissue type", "tissue source", "organ", "organ part",
+    "body site", "anatomical site", "anatomical location", "biopsy site",
+    "sample site", "tissue of origin", "body region", "sampling site",
 ]
 
 # Tissue keywords for detection
@@ -304,6 +315,14 @@ def extract_clinical_severity_from_characteristics(chars: dict[str, str]) -> str
     return None
 
 
+def extract_tissue_from_characteristics(chars: dict[str, str]) -> str | None:
+    """Extract tissue from parsed characteristics using explicit tissue keys."""
+    for key in TISSUE_CHAR_KEYS:
+        if key in chars:
+            return chars[key]
+    return None
+
+
 def extract_cell_type_from_characteristics(chars: dict[str, str]) -> str | None:
     """Extract cell type from parsed characteristics."""
     for key in CELL_TYPE_CHAR_KEYS:
@@ -355,6 +374,9 @@ def extract_disease_from_characteristics(chars: dict[str, str]) -> str | None:
     disease_keys = [
         "disease", "diagnosis", "condition", "disease state",
         "disease status", "pathology", "disease_state",
+        "disease type", "tumor type", "cancer type", "health status",
+        "clinical diagnosis", "phenotype", "histological type",
+        "histology", "disease name",
     ]
     for key in disease_keys:
         if key.lower() in chars:
@@ -392,6 +414,82 @@ def extract_disease_status_from_characteristics(
                 return (mapped, 1.0)
             return (chars[key].strip(), 0.70)
     return (None, 0.0)
+
+
+def parse_source_name(
+    source_name: str,
+) -> dict[str, str]:
+    """Parse a GEO source_name_ch1 field into structured metadata.
+
+    source_name often contains concatenated metadata separated by commas,
+    semicolons, or pipes, e.g., "colon, ulcerative colitis, male, 45y, infliximab".
+
+    Attempts to match each segment against ontology terms for tissue, disease,
+    cell type, and treatment. Returns a dict of detected fields.
+    """
+    from geotcha.harmonize.ontology import (
+        lookup_cell_type_with_confidence,
+        lookup_disease_with_confidence,
+        lookup_tissue_with_confidence,
+        lookup_treatment_with_confidence,
+    )
+
+    result: dict[str, str] = {}
+    if not source_name or not source_name.strip():
+        return result
+
+    # Split on common delimiters
+    segments = re.split(r"[,;|]+", source_name)
+    segments = [s.strip() for s in segments if s.strip()]
+
+    for segment in segments:
+        seg_lower = segment.lower().strip()
+        if not seg_lower:
+            continue
+
+        # Try tissue
+        if "tissue" not in result:
+            match = lookup_tissue_with_confidence(seg_lower)
+            if match and match[2] >= 0.80:
+                result["tissue"] = match[0]
+                continue
+
+        # Try disease
+        if "disease" not in result:
+            match = lookup_disease_with_confidence(seg_lower)
+            if match and match[2] >= 0.80:
+                result["disease"] = match[0]
+                continue
+
+        # Try cell type
+        if "cell_type" not in result:
+            match = lookup_cell_type_with_confidence(seg_lower)
+            if match and match[2] >= 0.80:
+                result["cell_type"] = match[0]
+                continue
+
+        # Try treatment
+        if "treatment" not in result:
+            match = lookup_treatment_with_confidence(seg_lower)
+            if match and match[2] >= 0.80:
+                result["treatment"] = match[0]
+                continue
+
+        # Try gender
+        if "gender" not in result and seg_lower in (
+            "male", "female", "m", "f", "man", "woman",
+        ):
+            result["gender"] = seg_lower
+            continue
+
+        # Try age (digits + optional unit)
+        if "age" not in result:
+            age_match = re.match(r"^(\d+)\s*(y|yr|years?|yo|yrs)?\.?$", seg_lower)
+            if age_match:
+                result["age"] = age_match.group(1)
+                continue
+
+    return result
 
 
 def aggregate_sample_field(samples: list, field: str) -> str | None:

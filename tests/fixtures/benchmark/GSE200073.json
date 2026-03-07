@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200073",
+  "input": {
+    "title": "Spleen transcriptome in lymphoma",
+    "summary": "RNA-seq of spleen from lymphoma patients",
+    "tissue": "spleen",
+    "disease": "lymphoma"
+  },
+  "expected": {
+    "tissue_harmonized": "spleen",
+    "tissue_ontology_id": "UBERON:0002106",
+    "disease_harmonized": "lymphoma",
+    "disease_ontology_id": "DOID:0060058"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000073",
+      "input": {
+        "tissue": "spleen",
+        "disease": "lymphoma",
+        "gender": "M",
+        "age": "55 years"
+      },
+      "expected": {
+        "tissue_harmonized": "spleen",
+        "disease_harmonized": "lymphoma",
+        "gender_harmonized": "male",
+        "age_harmonized": "55"
+      }
+    }
+  ]
+}

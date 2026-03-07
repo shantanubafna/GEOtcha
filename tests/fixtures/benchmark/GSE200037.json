@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200037",
+  "input": {
+    "title": "Major depressive disorder blood transcriptomics",
+    "summary": "RNA-seq of PBMCs from MDD patients",
+    "tissue": "peripheral blood",
+    "disease": "major depressive disorder"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "major depressive disorder",
+    "disease_ontology_id": "DOID:1470"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000037",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "major depressive disorder",
+        "gender": "F",
+        "age": "36 years",
+        "cell_type": "monocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "major depressive disorder",
+        "gender_harmonized": "female",
+        "age_harmonized": "36",
+        "cell_type_harmonized": "monocyte"
+      }
+    }
+  ]
+}

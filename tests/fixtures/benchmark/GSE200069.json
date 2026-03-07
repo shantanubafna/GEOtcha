@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200069",
+  "input": {
+    "title": "Age-related macular degeneration retina RNA-seq",
+    "summary": "RNA-seq of retinal tissue from AMD patients",
+    "tissue": "retina",
+    "disease": "macular degeneration"
+  },
+  "expected": {
+    "tissue_harmonized": "retina",
+    "tissue_ontology_id": "UBERON:0000966",
+    "disease_harmonized": "macular degeneration",
+    "disease_ontology_id": "DOID:4448"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000069",
+      "input": {
+        "tissue": "retina",
+        "disease": "macular degeneration",
+        "gender": "F",
+        "age": "76 years"
+      },
+      "expected": {
+        "tissue_harmonized": "retina",
+        "disease_harmonized": "macular degeneration",
+        "gender_harmonized": "female",
+        "age_harmonized": "76"
+      }
+    }
+  ]
+}

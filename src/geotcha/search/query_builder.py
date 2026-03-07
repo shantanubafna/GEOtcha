@@ -1,6 +1,8 @@
-"""Query construction with disease variant expansion."""
+"""Query construction with ontology-aware disease expansion."""
 
 from __future__ import annotations
+
+from functools import lru_cache
 
 # Disease expansion mappings with two tiers:
 # - search_terms: safe for Entrez queries (full names + unambiguous abbreviations)
@@ -205,17 +207,86 @@ DISEASE_EXPANSIONS: dict[str, dict[str, list[str]]] = {
     },
 }
 
+# Maximum number of ontology subtypes to include in search expansion
+_MAX_ONTOLOGY_SUBTYPES = 8
+
+
+# Common cancer term equivalences for subtype matching
+_CANCER_SYNONYMS = {
+    "cancer": ["carcinoma", "neoplasm", "tumor", "tumour", "malignancy"],
+    "carcinoma": ["cancer"],
+}
+
+
+@lru_cache(maxsize=256)
+def _ontology_subtypes(canonical: str) -> list[str]:
+    """Find disease subtypes from the DOID ontology whose names contain the query.
+
+    Returns up to _MAX_ONTOLOGY_SUBTYPES clinically common subtypes,
+    sorted shortest-first to prefer the most specific common names.
+    """
+    from geotcha.harmonize.ontology import DISEASE_ONTOLOGY
+
+    canonical_lower = canonical.lower()
+    # Skip very short terms to avoid noisy matches
+    if len(canonical_lower) < 4:
+        return []
+
+    # Build a set of search stems from the canonical name
+    # e.g., "lung cancer" → search for "lung cancer", "lung carcinoma", etc.
+    search_terms = {canonical_lower}
+    for word, synonyms in _CANCER_SYNONYMS.items():
+        if word in canonical_lower:
+            for syn in synonyms:
+                search_terms.add(canonical_lower.replace(word, syn))
+
+    subtypes: list[str] = []
+    for key, (name, _ont_id) in DISEASE_ONTOLOGY.items():
+        if key == canonical_lower:
+            continue
+        for term in search_terms:
+            if term in key:
+                subtypes.append(name)
+                break
+
+    # Sort by length (shorter = more common/clinically relevant), then alphabetical
+    subtypes.sort(key=lambda s: (len(s), s))
+    return subtypes[:_MAX_ONTOLOGY_SUBTYPES]
+
 
 def expand_disease_terms(query: str) -> list[str]:
     """Expand a disease keyword into search-safe variants.
 
     Returns a list of terms safe for use in Entrez queries
     (excludes ambiguous short abbreviations).
+
+    Uses two sources:
+    1. Hand-curated DISEASE_EXPANSIONS for well-known abbreviations/aliases
+    2. DOID ontology subtypes for any term that matches a disease in the ontology
     """
     key = query.lower().strip()
+
+    # Start with hand-curated expansions if available
     if key in DISEASE_EXPANSIONS:
-        return DISEASE_EXPANSIONS[key]["search_terms"]
-    return [query]
+        base = list(DISEASE_EXPANSIONS[key]["search_terms"])
+    else:
+        base = [query]
+
+    # Add ontology subtypes for the canonical disease name
+    from geotcha.harmonize.ontology import lookup_disease_with_confidence
+
+    match = lookup_disease_with_confidence(query)
+    if match and match[2] >= 0.85:
+        canonical = match[0]
+        subtypes = _ontology_subtypes(canonical)
+        # Add subtypes not already in the list
+        existing_lower = {t.lower() for t in base}
+        for st in subtypes:
+            if st.lower() not in existing_lower:
+                base.append(st)
+                existing_lower.add(st.lower())
+
+    return base
 
 
 def get_relevance_keywords(query: str) -> list[str]:

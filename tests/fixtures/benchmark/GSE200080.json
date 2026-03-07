@@ -1,0 +1,31 @@
+{
+  "gse_id": "GSE200080",
+  "input": {
+    "title": "Cyclosporine in kidney transplant",
+    "summary": "RNA-seq of kidney biopsy from transplant patients on cyclosporine",
+    "tissue": "kidney",
+    "treatment": "cyclosporine"
+  },
+  "expected": {
+    "tissue_harmonized": "kidney",
+    "tissue_ontology_id": "UBERON:0002113",
+    "treatment_harmonized": "cyclosporine"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000080",
+      "input": {
+        "tissue": "kidney",
+        "treatment": "cyclosporine",
+        "gender": "M",
+        "age": "46 years"
+      },
+      "expected": {
+        "tissue_harmonized": "kidney",
+        "treatment_harmonized": "cyclosporine",
+        "gender_harmonized": "male",
+        "age_harmonized": "46"
+      }
+    }
+  ]
+}

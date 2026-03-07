@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200053",
+  "input": {
+    "title": "HIV blood transcriptomics",
+    "summary": "RNA-seq of PBMCs from HIV-infected individuals",
+    "tissue": "peripheral blood",
+    "disease": "HIV infectious disease"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "HIV infectious disease",
+    "disease_ontology_id": "DOID:526"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000053",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "HIV infectious disease",
+        "gender": "M",
+        "age": "37 years",
+        "cell_type": "T cell"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "HIV infectious disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "37",
+        "cell_type_harmonized": "T cell"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200044",
+  "input": {
+    "title": "Obesity skeletal muscle RNA-seq",
+    "summary": "RNA-seq of skeletal muscle from obese subjects",
+    "tissue": "skeletal muscle tissue",
+    "disease": "obesity"
+  },
+  "expected": {
+    "tissue_harmonized": "skeletal muscle tissue",
+    "tissue_ontology_id": "UBERON:0001134",
+    "disease_harmonized": "obesity",
+    "disease_ontology_id": "DOID:9970"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000044",
+      "input": {
+        "tissue": "muscle",
+        "disease": "obesity",
+        "gender": "F",
+        "age": "43 years"
+      },
+      "expected": {
+        "tissue_harmonized": "skeletal muscle tissue",
+        "disease_harmonized": "obesity",
+        "gender_harmonized": "female",
+        "age_harmonized": "43"
+      }
+    }
+  ]
+}

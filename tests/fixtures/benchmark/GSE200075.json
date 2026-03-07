@@ -1,0 +1,29 @@
+{
+  "gse_id": "GSE200075",
+  "input": {
+    "title": "Aortic aneurysm transcriptome",
+    "summary": "RNA-seq of aortic wall tissue",
+    "tissue": "aorta"
+  },
+  "expected": {
+    "tissue_harmonized": "aorta",
+    "tissue_ontology_id": "UBERON:0000947"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000075",
+      "input": {
+        "tissue": "aorta",
+        "gender": "M",
+        "age": "71 years",
+        "cell_type": "endothelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "aorta",
+        "gender_harmonized": "male",
+        "age_harmonized": "71",
+        "cell_type_harmonized": "endothelial cell"
+      }
+    }
+  ]
+}

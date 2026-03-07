@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200035",
+  "input": {
+    "title": "Epilepsy hippocampus RNA-seq",
+    "summary": "RNA-seq of hippocampal tissue from epilepsy patients",
+    "tissue": "hippocampus",
+    "disease": "epilepsy"
+  },
+  "expected": {
+    "tissue_harmonized": "hippocampal formation",
+    "tissue_ontology_id": "UBERON:0002421",
+    "disease_harmonized": "epilepsy",
+    "disease_ontology_id": "DOID:1826"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000035",
+      "input": {
+        "tissue": "hippocampus",
+        "disease": "epilepsy",
+        "gender": "F",
+        "age": "28 years",
+        "cell_type": "neuron"
+      },
+      "expected": {
+        "tissue_harmonized": "hippocampal formation",
+        "disease_harmonized": "epilepsy",
+        "gender_harmonized": "female",
+        "age_harmonized": "28",
+        "cell_type_harmonized": "neuron"
+      }
+    }
+  ]
+}

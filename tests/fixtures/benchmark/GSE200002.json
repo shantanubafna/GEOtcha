@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200002",
+  "input": {
+    "title": "Lung adenocarcinoma gene expression",
+    "summary": "Bulk RNA-seq of lung cancer specimens",
+    "tissue": "lung",
+    "disease": "lung cancer",
+    "treatment": "pembrolizumab"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "lung cancer",
+    "disease_ontology_id": "DOID:1324",
+    "treatment_harmonized": "pembrolizumab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000002",
+      "input": {
+        "tissue": "lung",
+        "disease": "lung cancer",
+        "gender": "M",
+        "age": "68 years",
+        "treatment": "pembrolizumab"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "lung cancer",
+        "gender_harmonized": "male",
+        "age_harmonized": "68",
+        "treatment_harmonized": "pembrolizumab"
+      }
+    }
+  ]
+}

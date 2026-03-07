@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200046",
+  "input": {
+    "title": "Hepatitis B liver RNA-seq",
+    "summary": "RNA-seq of liver biopsies from HBV patients",
+    "tissue": "liver",
+    "disease": "hepatitis B"
+  },
+  "expected": {
+    "tissue_harmonized": "liver",
+    "tissue_ontology_id": "UBERON:0002107",
+    "disease_harmonized": "hepatitis B",
+    "disease_ontology_id": "DOID:2043"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000046",
+      "input": {
+        "tissue": "liver",
+        "disease": "hepatitis B",
+        "gender": "M",
+        "age": "39 years"
+      },
+      "expected": {
+        "tissue_harmonized": "liver",
+        "disease_harmonized": "hepatitis B",
+        "gender_harmonized": "male",
+        "age_harmonized": "39"
+      }
+    }
+  ]
+}

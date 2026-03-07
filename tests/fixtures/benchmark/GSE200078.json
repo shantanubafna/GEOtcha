@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200078",
+  "input": {
+    "title": "Cerebrospinal fluid transcriptomics in MS",
+    "summary": "RNA-seq of CSF cells from MS patients",
+    "tissue": "cerebrospinal fluid",
+    "disease": "multiple sclerosis"
+  },
+  "expected": {
+    "tissue_harmonized": "cerebrospinal fluid",
+    "tissue_ontology_id": "UBERON:0001359",
+    "disease_harmonized": "multiple sclerosis",
+    "disease_ontology_id": "DOID:2377"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000078",
+      "input": {
+        "tissue": "cerebrospinal fluid",
+        "disease": "multiple sclerosis",
+        "gender": "F",
+        "age": "38 years"
+      },
+      "expected": {
+        "tissue_harmonized": "cerebrospinal fluid",
+        "disease_harmonized": "multiple sclerosis",
+        "gender_harmonized": "female",
+        "age_harmonized": "38"
+      }
+    }
+  ]
+}

@@ -71,31 +71,37 @@ class TestJsonSchemaValidation:
 
 
 class TestRoundTripFidelity:
-    def test_tissue_count_matches(self):
-        assert len(TISSUE_ONTOLOGY) == 43
+    def test_tissue_count_expanded(self):
+        # Expanded from UBERON OBO: should have thousands of entries
+        assert len(TISSUE_ONTOLOGY) >= 300
 
-    def test_disease_count_matches(self):
-        assert len(DISEASE_ONTOLOGY) == 34
+    def test_disease_count_expanded(self):
+        # Expanded from DOID OBO: should have thousands of entries
+        assert len(DISEASE_ONTOLOGY) >= 500
 
     def test_tissue_colon_entry(self):
         name, ont_id = TISSUE_ONTOLOGY["colon"]
         assert name == "colon"
         assert ont_id == "UBERON:0001155"
 
-    def test_disease_uc_entry(self):
-        name, ont_id = DISEASE_ONTOLOGY["uc"]
+    def test_disease_ulcerative_colitis_entry(self):
+        name, ont_id = DISEASE_ONTOLOGY["ulcerative colitis"]
         assert name == "ulcerative colitis"
         assert ont_id == "DOID:8577"
 
+    def test_disease_uc_synonym(self):
+        # "uc" is now a synonym (abbreviation), not a direct entry
+        assert DISEASE_SYNONYMS["uc"] == "ulcerative colitis"
+
     def test_cell_type_loads(self):
-        assert len(CELL_TYPE_ONTOLOGY) >= 40
+        assert len(CELL_TYPE_ONTOLOGY) >= 250
         assert "t cell" in CELL_TYPE_ONTOLOGY
         name, ont_id = CELL_TYPE_ONTOLOGY["t cell"]
         assert name == "T cell"
         assert ont_id == "CL:0000084"
 
     def test_treatment_loads(self):
-        assert len(TREATMENT_ONTOLOGY) >= 60
+        assert len(TREATMENT_ONTOLOGY) >= 200
         assert "infliximab" in TREATMENT_ONTOLOGY
 
     def test_tissue_synonyms(self):

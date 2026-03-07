@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200076",
+  "input": {
+    "title": "Sigmoid colon IBD biopsy RNA-seq",
+    "summary": "RNA-seq of sigmoid colon biopsies",
+    "tissue": "sigmoid colon",
+    "disease": "ulcerative colitis"
+  },
+  "expected": {
+    "tissue_harmonized": "sigmoid colon",
+    "tissue_ontology_id": "UBERON:0001159",
+    "disease_harmonized": "ulcerative colitis",
+    "disease_ontology_id": "DOID:8577"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000076",
+      "input": {
+        "tissue": "sigmoid colon",
+        "disease": "ulcerative colitis",
+        "gender": "F",
+        "age": "29 years"
+      },
+      "expected": {
+        "tissue_harmonized": "sigmoid colon",
+        "disease_harmonized": "ulcerative colitis",
+        "gender_harmonized": "female",
+        "age_harmonized": "29"
+      }
+    }
+  ]
+}

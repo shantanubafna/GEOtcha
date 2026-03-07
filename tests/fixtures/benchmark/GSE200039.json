@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200039",
+  "input": {
+    "title": "Autism spectrum disorder cortex RNA-seq",
+    "summary": "RNA-seq of frontal cortex from ASD subjects",
+    "tissue": "cerebral cortex",
+    "disease": "autism spectrum disorder"
+  },
+  "expected": {
+    "tissue_harmonized": "cerebral cortex",
+    "tissue_ontology_id": "UBERON:0000956",
+    "disease_harmonized": "autism spectrum disorder",
+    "disease_ontology_id": "DOID:0060041"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000039",
+      "input": {
+        "tissue": "cerebral cortex",
+        "disease": "autism spectrum disorder",
+        "gender": "M",
+        "age": "12 years"
+      },
+      "expected": {
+        "tissue_harmonized": "cerebral cortex",
+        "disease_harmonized": "autism spectrum disorder",
+        "gender_harmonized": "male",
+        "age_harmonized": "12"
+      }
+    }
+  ]
+}

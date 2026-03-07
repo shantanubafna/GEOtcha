@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE200001",
+  "input": {
+    "title": "Breast cancer transcriptome profiling",
+    "summary": "RNA-seq of breast tumor samples",
+    "tissue": "breast",
+    "disease": "breast cancer",
+    "treatment": "tamoxifen"
+  },
+  "expected": {
+    "tissue_harmonized": "mammary gland",
+    "tissue_ontology_id": "UBERON:0001911",
+    "disease_harmonized": "breast cancer",
+    "disease_ontology_id": "DOID:1612",
+    "treatment_harmonized": "tamoxifen"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000001",
+      "input": {
+        "tissue": "breast",
+        "disease": "breast cancer",
+        "gender": "F",
+        "age": "55 years",
+        "treatment": "tamoxifen",
+        "cell_type": "epithelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "mammary gland",
+        "disease_harmonized": "breast cancer",
+        "gender_harmonized": "female",
+        "age_harmonized": "55",
+        "treatment_harmonized": "tamoxifen",
+        "cell_type_harmonized": "epithelial cell"
+      }
+    }
+  ]
+}

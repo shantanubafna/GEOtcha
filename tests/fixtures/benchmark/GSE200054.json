@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200054",
+  "input": {
+    "title": "Influenza infection nasal epithelium RNA-seq",
+    "summary": "RNA-seq of nasal epithelial cells during flu infection",
+    "tissue": "lung",
+    "disease": "influenza"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "influenza",
+    "disease_ontology_id": "DOID:8469"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000054",
+      "input": {
+        "tissue": "lung",
+        "disease": "influenza",
+        "gender": "F",
+        "age": "30 years"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "influenza",
+        "gender_harmonized": "female",
+        "age_harmonized": "30"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200020",
+  "input": {
+    "title": "Head and neck squamous cell carcinoma RNA-seq",
+    "summary": "RNA-seq of HNSCC tumors treated with cetuximab",
+    "tissue": "oral cavity",
+    "disease": "head and neck squamous cell carcinoma"
+  },
+  "expected": {
+    "tissue_harmonized": "oral cavity",
+    "tissue_ontology_id": "UBERON:0000167",
+    "disease_harmonized": "head and neck squamous cell carcinoma",
+    "disease_ontology_id": "DOID:5520"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000020",
+      "input": {
+        "tissue": "oral cavity",
+        "disease": "head and neck squamous cell carcinoma",
+        "gender": "M",
+        "age": "61 years"
+      },
+      "expected": {
+        "tissue_harmonized": "oral cavity",
+        "disease_harmonized": "head and neck squamous cell carcinoma",
+        "gender_harmonized": "male",
+        "age_harmonized": "61"
+      }
+    }
+  ]
+}

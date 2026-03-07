@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE200021",
+  "input": {
+    "title": "Rheumatoid arthritis synovial transcriptome",
+    "summary": "RNA-seq of synovial tissue from RA patients",
+    "tissue": "synovial membrane",
+    "disease": "rheumatoid arthritis",
+    "treatment": "methotrexate"
+  },
+  "expected": {
+    "tissue_harmonized": "synovial membrane of synovial joint",
+    "tissue_ontology_id": "UBERON:0002018",
+    "disease_harmonized": "rheumatoid arthritis",
+    "disease_ontology_id": "DOID:7148",
+    "treatment_harmonized": "methotrexate"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000021",
+      "input": {
+        "tissue": "synovial membrane",
+        "disease": "RA",
+        "gender": "F",
+        "age": "48 years",
+        "treatment": "methotrexate",
+        "cell_type": "macrophage"
+      },
+      "expected": {
+        "tissue_harmonized": "synovial membrane of synovial joint",
+        "disease_harmonized": "rheumatoid arthritis",
+        "gender_harmonized": "female",
+        "age_harmonized": "48",
+        "treatment_harmonized": "methotrexate",
+        "cell_type_harmonized": "macrophage"
+      }
+    }
+  ]
+}

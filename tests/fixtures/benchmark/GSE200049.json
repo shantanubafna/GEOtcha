@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE200049",
+  "input": {
+    "title": "Asthma airway epithelium RNA-seq",
+    "summary": "RNA-seq of bronchial epithelium from asthma patients",
+    "tissue": "lung",
+    "disease": "asthma",
+    "treatment": "budesonide"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "asthma",
+    "disease_ontology_id": "DOID:2841",
+    "treatment_harmonized": "budesonide"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000049",
+      "input": {
+        "tissue": "lung",
+        "disease": "asthma",
+        "gender": "F",
+        "age": "29 years",
+        "treatment": "budesonide",
+        "cell_type": "epithelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "asthma",
+        "gender_harmonized": "female",
+        "age_harmonized": "29",
+        "treatment_harmonized": "budesonide",
+        "cell_type_harmonized": "epithelial cell"
+      }
+    }
+  ]
+}

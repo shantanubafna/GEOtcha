@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200059",
+  "input": {
+    "title": "UC colon transcriptome with abbreviation input",
+    "summary": "RNA-seq of colonic mucosa from UC patients",
+    "tissue": "colon",
+    "disease": "UC",
+    "treatment": "mesalamine"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "ulcerative colitis",
+    "disease_ontology_id": "DOID:8577",
+    "treatment_harmonized": "mesalamine"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000059",
+      "input": {
+        "tissue": "colon",
+        "disease": "UC",
+        "gender": "M",
+        "age": "40 years"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "ulcerative colitis",
+        "gender_harmonized": "male",
+        "age_harmonized": "40"
+      }
+    }
+  ]
+}

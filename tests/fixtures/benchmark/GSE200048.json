@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200048",
+  "input": {
+    "title": "Idiopathic pulmonary fibrosis lung RNA-seq",
+    "summary": "RNA-seq of IPF lung tissue",
+    "tissue": "lung",
+    "disease": "idiopathic pulmonary fibrosis"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "idiopathic pulmonary fibrosis",
+    "disease_ontology_id": "DOID:0050156"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000048",
+      "input": {
+        "tissue": "lung",
+        "disease": "idiopathic pulmonary fibrosis",
+        "gender": "M",
+        "age": "70 years",
+        "cell_type": "fibroblast"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "idiopathic pulmonary fibrosis",
+        "gender_harmonized": "male",
+        "age_harmonized": "70",
+        "cell_type_harmonized": "fibroblast"
+      }
+    }
+  ]
+}

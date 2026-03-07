@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE200007",
+  "input": {
+    "title": "Non-Hodgkin lymphoma gene expression",
+    "summary": "RNA-seq of lymph node biopsies",
+    "tissue": "lymph node",
+    "disease": "non-Hodgkin lymphoma",
+    "treatment": "rituximab"
+  },
+  "expected": {
+    "tissue_harmonized": "lymph node",
+    "tissue_ontology_id": "UBERON:0000029",
+    "disease_harmonized": "non-Hodgkin lymphoma",
+    "disease_ontology_id": "DOID:0060060",
+    "treatment_harmonized": "rituximab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000007",
+      "input": {
+        "tissue": "lymph node",
+        "disease": "non-Hodgkin lymphoma",
+        "gender": "M",
+        "age": "58 years",
+        "treatment": "rituximab",
+        "cell_type": "B cell"
+      },
+      "expected": {
+        "tissue_harmonized": "lymph node",
+        "disease_harmonized": "non-Hodgkin lymphoma",
+        "gender_harmonized": "male",
+        "age_harmonized": "58",
+        "treatment_harmonized": "rituximab",
+        "cell_type_harmonized": "B cell"
+      }
+    }
+  ]
+}

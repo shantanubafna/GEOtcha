@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200018",
+  "input": {
+    "title": "Bladder cancer gene expression",
+    "summary": "RNA-seq of bladder urothelial carcinoma",
+    "tissue": "urinary bladder",
+    "disease": "bladder cancer"
+  },
+  "expected": {
+    "tissue_harmonized": "urinary bladder",
+    "tissue_ontology_id": "UBERON:0001255",
+    "disease_harmonized": "urinary bladder cancer",
+    "disease_ontology_id": "DOID:11054"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000018",
+      "input": {
+        "tissue": "urinary bladder",
+        "disease": "bladder cancer",
+        "gender": "M",
+        "age": "69 years"
+      },
+      "expected": {
+        "tissue_harmonized": "urinary bladder",
+        "disease_harmonized": "urinary bladder cancer",
+        "gender_harmonized": "male",
+        "age_harmonized": "69"
+      }
+    }
+  ]
+}

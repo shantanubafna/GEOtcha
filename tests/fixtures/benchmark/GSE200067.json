@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200067",
+  "input": {
+    "title": "LPS stimulation time course",
+    "summary": "RNA-seq of macrophages stimulated with LPS",
+    "tissue": "peripheral blood",
+    "disease": "healthy",
+    "treatment": "LPS",
+    "timepoint": "24h"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "treatment_harmonized": "lipopolysaccharide",
+    "timepoint_harmonized": "H24"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000067",
+      "input": {
+        "tissue": "peripheral blood",
+        "treatment": "LPS",
+        "timepoint": "24h",
+        "cell_type": "macrophage"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "treatment_harmonized": "lipopolysaccharide",
+        "timepoint_harmonized": "H24",
+        "cell_type_harmonized": "macrophage"
+      }
+    }
+  ]
+}

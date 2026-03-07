@@ -48,3 +48,6 @@ coverage.xml
 
 # Internal planning docs (not for public repo)
 geotcha_roadmap/
+
+# OBO cache (build script downloads)
+scripts/.obo_cache/

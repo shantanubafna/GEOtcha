@@ -1,0 +1,45 @@
+{
+  "roots": [
+    "CL:0000000"
+  ],
+  "max_depth": null,
+  "id_prefix": "CL:",
+  "exclude_patterns": [
+    "plant ", "fungal", "bacterial",
+    "obsolete", "(mmus)", "(hsap)",
+    "experimentally modified cell"
+  ],
+  "include": [],
+  "extra_entries": {
+    "treg": ["regulatory T cell", "CL:0000815"],
+    "cd4+ t cell": ["CD4-positive, alpha-beta T cell", "CL:0000624"],
+    "cd4 t cell": ["CD4-positive, alpha-beta T cell", "CL:0000624"],
+    "cd8+ t cell": ["CD8-positive, alpha-beta T cell", "CL:0000625"],
+    "cd8 t cell": ["CD8-positive, alpha-beta T cell", "CL:0000625"],
+    "nk cell": ["natural killer cell", "CL:0000623"],
+    "red blood cell": ["erythrocyte", "CL:0000232"]
+  },
+  "extra_synonyms": {
+    "nk": "natural killer cell",
+    "nk cell": "natural killer cell",
+    "t-cell": "t cell",
+    "b-cell": "b cell",
+    "treg": "regulatory t cell",
+    "t-reg": "regulatory t cell",
+    "tregs": "regulatory t cell",
+    "cd4": "cd4-positive, alpha-beta t cell",
+    "cd8": "cd8-positive, alpha-beta t cell",
+    "dc": "dendritic cell",
+    "rbc": "erythrocyte",
+    "hsc": "hematopoietic stem cell",
+    "msc": "mesenchymal stem cell",
+    "epithelial": "epithelial cell",
+    "endothelial": "endothelial cell",
+    "monocytes": "monocyte",
+    "macrophages": "macrophage",
+    "neutrophils": "neutrophil",
+    "fibroblasts": "fibroblast",
+    "neurons": "neuron",
+    "platelets": "platelet"
+  }
+}

@@ -27,7 +27,7 @@ FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "benchmark"
 class TestLoadFixtures:
     def test_loads_all_fixtures(self):
         fixtures = load_fixtures(FIXTURES_DIR)
-        assert len(fixtures) == 20
+        assert len(fixtures) >= 100
 
     def test_fixture_has_required_keys(self):
         fixtures = load_fixtures(FIXTURES_DIR)
@@ -72,7 +72,7 @@ class TestRunBenchmark:
     def test_fixture_count(self):
         fixtures = load_fixtures(FIXTURES_DIR)
         result = run_benchmark(fixtures)
-        assert result.fixture_count == 20
+        assert result.fixture_count >= 100
 
     def test_summary_keys(self):
         fixtures = load_fixtures(FIXTURES_DIR)

@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200033",
+  "input": {
+    "title": "ALS spinal cord transcriptome",
+    "summary": "RNA-seq of spinal cord motor neurons from ALS patients",
+    "tissue": "spinal cord",
+    "disease": "amyotrophic lateral sclerosis"
+  },
+  "expected": {
+    "tissue_harmonized": "spinal cord",
+    "tissue_ontology_id": "UBERON:0002240",
+    "disease_harmonized": "amyotrophic lateral sclerosis",
+    "disease_ontology_id": "DOID:332"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000033",
+      "input": {
+        "tissue": "spinal cord",
+        "disease": "ALS",
+        "gender": "M",
+        "age": "58 years",
+        "cell_type": "neuron"
+      },
+      "expected": {
+        "tissue_harmonized": "spinal cord",
+        "disease_harmonized": "amyotrophic lateral sclerosis",
+        "gender_harmonized": "male",
+        "age_harmonized": "58",
+        "cell_type_harmonized": "neuron"
+      }
+    }
+  ]
+}

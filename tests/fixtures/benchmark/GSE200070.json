@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200070",
+  "input": {
+    "title": "Preeclampsia placental transcriptome",
+    "summary": "RNA-seq of placental tissue from preeclampsia cases",
+    "tissue": "placenta",
+    "disease": "pre-eclampsia"
+  },
+  "expected": {
+    "tissue_harmonized": "placenta",
+    "tissue_ontology_id": "UBERON:0001987",
+    "disease_harmonized": "pre-eclampsia",
+    "disease_ontology_id": "DOID:10591"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000070",
+      "input": {
+        "tissue": "placenta",
+        "disease": "pre-eclampsia",
+        "gender": "F",
+        "age": "31 years"
+      },
+      "expected": {
+        "tissue_harmonized": "placenta",
+        "disease_harmonized": "pre-eclampsia",
+        "gender_harmonized": "female",
+        "age_harmonized": "31"
+      }
+    }
+  ]
+}

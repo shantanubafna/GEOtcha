@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200012",
+  "input": {
+    "title": "Chronic lymphocytic leukemia transcriptome",
+    "summary": "RNA-seq of CLL peripheral blood samples",
+    "tissue": "peripheral blood",
+    "disease": "chronic lymphocytic leukemia"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "chronic lymphocytic leukemia",
+    "disease_ontology_id": "DOID:1040"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000012",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "chronic lymphocytic leukemia",
+        "gender": "M",
+        "age": "66 years",
+        "cell_type": "B cell"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "chronic lymphocytic leukemia",
+        "gender_harmonized": "male",
+        "age_harmonized": "66",
+        "cell_type_harmonized": "B cell"
+      }
+    }
+  ]
+}

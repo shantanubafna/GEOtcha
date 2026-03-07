@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200011",
+  "input": {
+    "title": "Ovarian cancer transcriptomics",
+    "summary": "RNA-seq of high-grade serous ovarian cancer",
+    "tissue": "ovary",
+    "disease": "ovarian cancer",
+    "treatment": "paclitaxel"
+  },
+  "expected": {
+    "tissue_harmonized": "ovary",
+    "tissue_ontology_id": "UBERON:0000992",
+    "disease_harmonized": "ovarian cancer",
+    "disease_ontology_id": "DOID:2394",
+    "treatment_harmonized": "paclitaxel"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000011",
+      "input": {
+        "tissue": "ovary",
+        "disease": "ovarian cancer",
+        "gender": "F",
+        "age": "61 years",
+        "treatment": "paclitaxel"
+      },
+      "expected": {
+        "tissue_harmonized": "ovary",
+        "disease_harmonized": "ovarian cancer",
+        "gender_harmonized": "female",
+        "age_harmonized": "61",
+        "treatment_harmonized": "paclitaxel"
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200003",
+  "input": {
+    "title": "Colorectal cancer transcriptomics",
+    "summary": "RNA-seq of colon tumor and adjacent normal tissue",
+    "tissue": "colon",
+    "disease": "colorectal cancer",
+    "treatment": "cisplatin"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "colorectal cancer",
+    "disease_ontology_id": "DOID:9256",
+    "treatment_harmonized": "cisplatin"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000003",
+      "input": {
+        "tissue": "colon",
+        "disease": "colorectal cancer",
+        "gender": "M",
+        "age": "62 years",
+        "cell_type": "epithelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "colorectal cancer",
+        "gender_harmonized": "male",
+        "age_harmonized": "62",
+        "cell_type_harmonized": "epithelial cell"
+      }
+    }
+  ]
+}

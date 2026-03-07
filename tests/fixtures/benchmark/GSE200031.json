@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200031",
+  "input": {
+    "title": "Systemic sclerosis skin transcriptome",
+    "summary": "RNA-seq of scleroderma skin biopsies",
+    "tissue": "skin",
+    "disease": "systemic scleroderma"
+  },
+  "expected": {
+    "tissue_harmonized": "skin of body",
+    "tissue_ontology_id": "UBERON:0002097",
+    "disease_harmonized": "systemic scleroderma",
+    "disease_ontology_id": "DOID:418"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000031",
+      "input": {
+        "tissue": "skin",
+        "disease": "systemic scleroderma",
+        "gender": "F",
+        "age": "50 years",
+        "cell_type": "fibroblast"
+      },
+      "expected": {
+        "tissue_harmonized": "skin of body",
+        "disease_harmonized": "systemic scleroderma",
+        "gender_harmonized": "female",
+        "age_harmonized": "50",
+        "cell_type_harmonized": "fibroblast"
+      }
+    }
+  ]
+}

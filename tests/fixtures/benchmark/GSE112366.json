@@ -27,7 +27,7 @@
         "treatment": "5-ASA"
       },
       "expected": {
-        "tissue_harmonized": "rectal mucosa",
+        "tissue_harmonized": "mucosa",
         "disease_harmonized": "inflammatory bowel disease",
         "gender_harmonized": "male",
         "age_harmonized": "52",

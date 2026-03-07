@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200058",
+  "input": {
+    "title": "Dengue fever blood transcriptomics",
+    "summary": "RNA-seq of blood from dengue patients",
+    "tissue": "whole blood",
+    "disease": "dengue fever"
+  },
+  "expected": {
+    "tissue_harmonized": "blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "dengue disease",
+    "disease_ontology_id": "DOID:11205"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000058",
+      "input": {
+        "tissue": "whole blood",
+        "disease": "dengue fever",
+        "gender": "F",
+        "age": "22 years"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "dengue disease",
+        "gender_harmonized": "female",
+        "age_harmonized": "22"
+      }
+    }
+  ]
+}

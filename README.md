@@ -105,7 +105,7 @@ Emits structured JSON log lines to stderr — useful for log aggregation in prod
 ### Benchmark harmonization quality
 
 ```bash
-# Run against bundled fixtures (20 curated datasets)
+# Run against bundled fixtures (100 curated datasets)
 geotcha benchmark
 
 # Custom fixtures and output
@@ -214,10 +214,17 @@ Interrupted runs can be resumed with `geotcha resume <run_id>`. Resume correctly
 
 ## Disease Expansion
 
-GEOtcha automatically expands disease keywords to capture related terms:
-- **IBD** → inflammatory bowel disease, ulcerative colitis, Crohn's disease (abbreviations like UC, CD are used for relevance filtering)
-- **SLE** → systemic lupus erythematosus, lupus
-- **RA** → rheumatoid arthritis
+GEOtcha automatically expands disease keywords to capture related terms using two sources:
+
+1. **Hand-curated aliases** for common abbreviations (IBD, SLE, RA, COPD, etc.)
+2. **DOID ontology subtypes** — any disease in the 12,000-term Disease Ontology is auto-expanded with its subtypes (e.g., "breast cancer" also searches "breast carcinoma", "triple-negative breast cancer", etc.)
+
+Examples:
+- **IBD** → inflammatory bowel disease, ulcerative colitis, Crohn's disease + DOID subtypes
+- **breast cancer** → breast cancer, breast carcinoma, male/female breast cancer, luminal breast carcinoma, ...
+- **melanoma** → melanoma, skin melanoma, uveal melanoma, mucosal melanoma, ...
+
+Short ambiguous abbreviations (UC, CD) are excluded from Entrez search queries but used for post-search relevance filtering.
 
 ## Filtering
 
@@ -247,13 +254,21 @@ Three-tier harmonization pipeline (each layer is optional):
 ### 1. Rules (always on with `--harmonize`)
 - **Gender**: male/M/man → "male"
 - **Age**: "45 years", "45yo" → "45"
-- **Tissue**: mapped to UBERON ontology terms with synonym resolution
-- **Disease**: mapped to Disease Ontology (DOID) terms with synonym resolution
-- **Cell type**: mapped to Cell Ontology (CL) terms with synonym resolution
-- **Treatment**: drug/biologic name recognition with brand name synonyms (e.g., Remicade → infliximab)
+- **Tissue**: mapped to UBERON ontology (~4,000 terms from OBO Foundry)
+- **Disease**: mapped to Disease Ontology (~12,000 DOID terms + common abbreviations like UC, IBD, COPD)
+- **Cell type**: mapped to Cell Ontology (~3,000 CL terms)
+- **Treatment**: ~300 drugs/stimuli with ChEBI IDs, brand name synonyms (e.g., Remicade → infliximab)
 - **Timepoint**: "week 8", "W8" → "W8"
 
-Ontology mappings are shipped as JSON package data (`src/geotcha/data/ontology/`) — easy to extend without touching Python code.
+Five confidence tiers: exact (1.0) → synonym (0.85) → normalized-exact (0.80) → token-set overlap (0.75) → substring (0.70). Fields below the review threshold are flagged for manual review.
+
+Extraction uses 40+ GEO characteristic keys (tissue, disease, cell type, treatment) and a `source_name` parser that splits concatenated metadata (e.g., "colon, ulcerative colitis, male, 45y") into structured fields.
+
+Ontology mappings are shipped as JSON package data (`src/geotcha/data/ontology/`) with ~27,000 synonyms extracted from official OBO sources. To regenerate from upstream ontologies:
+
+```bash
+python scripts/build_ontologies.py
+```
 
 ### 2. ML (`--ml-mode hybrid` or `--ml-mode full`)
 - **GLiNER-BioMed**: zero-shot biomedical NER for disease, tissue, cell type, treatment, gender

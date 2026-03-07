@@ -1,0 +1,31 @@
+{
+  "gse_id": "GSE200064",
+  "input": {
+    "title": "Healthy control blood RNA-seq",
+    "summary": "RNA-seq of healthy donor PBMCs",
+    "tissue": "peripheral blood",
+    "treatment": "untreated"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "treatment_harmonized": "untreated"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000064",
+      "input": {
+        "tissue": "peripheral blood",
+        "gender": "F",
+        "age": "30 years",
+        "cell_type": "T cell"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "gender_harmonized": "female",
+        "age_harmonized": "30",
+        "cell_type_harmonized": "T cell"
+      }
+    }
+  ]
+}

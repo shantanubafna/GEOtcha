@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200077",
+  "input": {
+    "title": "Ascending colon Crohn's disease RNA-seq",
+    "summary": "RNA-seq of ascending colon biopsies from CD",
+    "tissue": "ascending colon",
+    "disease": "crohn's disease"
+  },
+  "expected": {
+    "tissue_harmonized": "ascending colon",
+    "tissue_ontology_id": "UBERON:0001156",
+    "disease_harmonized": "Crohn's disease",
+    "disease_ontology_id": "DOID:8778"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000077",
+      "input": {
+        "tissue": "ascending colon",
+        "disease": "crohn's disease",
+        "gender": "M",
+        "age": "34 years"
+      },
+      "expected": {
+        "tissue_harmonized": "ascending colon",
+        "disease_harmonized": "Crohn's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "34"
+      }
+    }
+  ]
+}

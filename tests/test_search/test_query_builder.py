@@ -52,6 +52,49 @@ class TestGetRelevanceKeywords:
         assert "UC" in keywords
 
 
+class TestOntologyAwareExpansion:
+    def test_breast_cancer_includes_subtypes(self):
+        terms = expand_disease_terms("breast cancer")
+        assert "breast cancer" in terms
+        assert any("carcinoma" in t for t in terms)
+        assert len(terms) > 1
+
+    def test_lung_cancer_includes_carcinoma(self):
+        terms = expand_disease_terms("lung cancer")
+        assert "lung cancer" in terms
+        assert "lung carcinoma" in terms
+
+    def test_melanoma_includes_subtypes(self):
+        terms = expand_disease_terms("melanoma")
+        assert "melanoma" in terms
+        assert len(terms) > 1
+
+    def test_unknown_disease_no_expansion(self):
+        terms = expand_disease_terms("completely fictional disease xyz")
+        assert terms == ["completely fictional disease xyz"]
+
+    def test_short_term_no_noise(self):
+        """Short terms (< 4 chars) should not trigger noisy ontology expansion."""
+        terms = expand_disease_terms("flu")
+        assert "flu" in terms
+
+    def test_ibd_gets_ontology_subtypes_too(self):
+        """Hand-curated + ontology expansions should combine."""
+        terms = expand_disease_terms("IBD")
+        assert "inflammatory bowel disease" in terms
+        assert len(terms) > 5
+
+    def test_expansion_is_cached(self):
+        """Second call should use cache."""
+        t1 = expand_disease_terms("glioblastoma")
+        t2 = expand_disease_terms("glioblastoma")
+        assert t1 == t2
+
+    def test_build_query_includes_subtypes(self):
+        query = build_query("breast cancer")
+        assert "breast carcinoma" in query
+
+
 class TestBuildQuery:
     def test_builds_entrez_query(self):
         query = build_query("IBD")

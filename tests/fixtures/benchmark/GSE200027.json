@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200027",
+  "input": {
+    "title": "Multiple sclerosis brain lesions",
+    "summary": "RNA-seq of MS brain white matter lesions",
+    "tissue": "brain",
+    "disease": "multiple sclerosis"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "multiple sclerosis",
+    "disease_ontology_id": "DOID:2377"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000027",
+      "input": {
+        "tissue": "brain",
+        "disease": "MS",
+        "gender": "F",
+        "age": "41 years",
+        "cell_type": "astrocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "multiple sclerosis",
+        "gender_harmonized": "female",
+        "age_harmonized": "41",
+        "cell_type_harmonized": "astrocyte"
+      }
+    }
+  ]
+}

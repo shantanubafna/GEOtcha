@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200056",
+  "input": {
+    "title": "Sepsis blood transcriptomics",
+    "summary": "RNA-seq of blood from sepsis patients in ICU",
+    "tissue": "whole blood",
+    "disease": "sepsis"
+  },
+  "expected": {
+    "tissue_harmonized": "blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "sepsis",
+    "disease_ontology_id": "DOID:0060032"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000056",
+      "input": {
+        "tissue": "whole blood",
+        "disease": "sepsis",
+        "gender": "M",
+        "age": "62 years",
+        "cell_type": "neutrophil"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "sepsis",
+        "gender_harmonized": "male",
+        "age_harmonized": "62",
+        "cell_type_harmonized": "neutrophil"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200034",
+  "input": {
+    "title": "Parkinson disease substantia nigra RNA-seq",
+    "summary": "RNA-seq of midbrain from PD patients",
+    "tissue": "brain",
+    "disease": "Parkinson's disease"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "Parkinson's disease",
+    "disease_ontology_id": "DOID:14330"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000034",
+      "input": {
+        "tissue": "brain",
+        "disease": "Parkinson's disease",
+        "gender": "M",
+        "age": "73 years",
+        "cell_type": "neuron"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "Parkinson's disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "73",
+        "cell_type_harmonized": "neuron"
+      }
+    }
+  ]
+}

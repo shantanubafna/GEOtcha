@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200047",
+  "input": {
+    "title": "COPD lung transcriptome",
+    "summary": "RNA-seq of lung tissue from COPD patients",
+    "tissue": "lung",
+    "disease": "chronic obstructive pulmonary disease"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "chronic obstructive pulmonary disease",
+    "disease_ontology_id": "DOID:3083"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000047",
+      "input": {
+        "tissue": "lung",
+        "disease": "COPD",
+        "gender": "M",
+        "age": "64 years"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "chronic obstructive pulmonary disease",
+        "gender_harmonized": "male",
+        "age_harmonized": "64"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200066",
+  "input": {
+    "title": "Dexamethasone dose response in RA",
+    "summary": "RNA-seq of synovial fibroblasts at multiple dexamethasone doses",
+    "tissue": "synovial membrane",
+    "disease": "rheumatoid arthritis",
+    "treatment": "dexamethasone"
+  },
+  "expected": {
+    "tissue_harmonized": "synovial membrane of synovial joint",
+    "tissue_ontology_id": "UBERON:0002018",
+    "disease_harmonized": "rheumatoid arthritis",
+    "disease_ontology_id": "DOID:7148",
+    "treatment_harmonized": "dexamethasone"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000066",
+      "input": {
+        "tissue": "synovial membrane",
+        "disease": "rheumatoid arthritis",
+        "treatment": "dexamethasone",
+        "cell_type": "fibroblast"
+      },
+      "expected": {
+        "tissue_harmonized": "synovial membrane of synovial joint",
+        "disease_harmonized": "rheumatoid arthritis",
+        "treatment_harmonized": "dexamethasone",
+        "cell_type_harmonized": "fibroblast"
+      }
+    }
+  ]
+}

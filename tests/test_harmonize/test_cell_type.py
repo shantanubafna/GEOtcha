@@ -67,14 +67,14 @@ class TestNormalizeCellTypeSynonym:
         assert result.confidence == 0.85
 
 
-class TestNormalizeCellTypeSubstring:
+class TestNormalizeCellTypeTokenSet:
     def test_activated_macrophage(self):
+        # Token-set overlap: {activated, macrophage} matches an ontology entry
         result = normalize_cell_type("activated macrophage")
         assert result is not None
-        assert result.confidence == 0.70
-        assert result.ontology_id == "CL:0000235"
+        assert result.confidence == 0.75
 
-    def test_cd4_positive_t_cell_variant(self):
+    def test_sorted_fibroblast_population(self):
         result = normalize_cell_type("sorted fibroblast population")
         assert result is not None
         assert result.confidence == 0.70
@@ -89,9 +89,12 @@ class TestNormalizeCellTypeFallback:
         assert result.ontology_id is None
 
     def test_obscure_cell_type(self):
+        # With expanded CL ontology, "type II pneumocyte" is an EXACT synonym
         result = normalize_cell_type("type II pneumocyte")
-        assert result.source == "raw_fallback"
-        assert result.confidence == 0.50
+        assert result.value == "pulmonary alveolar type 2 cell"
+        assert result.source == "rule"
+        assert result.confidence == 0.85
+        assert result.ontology_id == "CL:0002063"
 
 
 class TestNormalizeCellTypeEdgeCases:

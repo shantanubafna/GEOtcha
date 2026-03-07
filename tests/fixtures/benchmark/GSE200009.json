@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200009",
+  "input": {
+    "title": "Pancreatic cancer RNA-seq",
+    "summary": "Transcriptome of pancreatic ductal adenocarcinoma",
+    "tissue": "pancreas",
+    "disease": "pancreatic cancer",
+    "treatment": "gemcitabine"
+  },
+  "expected": {
+    "tissue_harmonized": "pancreas",
+    "tissue_ontology_id": "UBERON:0001264",
+    "disease_harmonized": "pancreatic cancer",
+    "disease_ontology_id": "DOID:1793",
+    "treatment_harmonized": "gemcitabine"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000009",
+      "input": {
+        "tissue": "pancreas",
+        "disease": "pancreatic cancer",
+        "gender": "F",
+        "age": "67 years",
+        "treatment": "gemcitabine"
+      },
+      "expected": {
+        "tissue_harmonized": "pancreas",
+        "disease_harmonized": "pancreatic cancer",
+        "gender_harmonized": "female",
+        "age_harmonized": "67",
+        "treatment_harmonized": "gemcitabine"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200010",
+  "input": {
+    "title": "Prostate cancer gene expression",
+    "summary": "RNA-seq of prostate adenocarcinoma",
+    "tissue": "prostate",
+    "disease": "prostate cancer"
+  },
+  "expected": {
+    "tissue_harmonized": "prostate gland",
+    "tissue_ontology_id": "UBERON:0002367",
+    "disease_harmonized": "prostate cancer",
+    "disease_ontology_id": "DOID:10283"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000010",
+      "input": {
+        "tissue": "prostate",
+        "disease": "prostate cancer",
+        "gender": "M",
+        "age": "72 years"
+      },
+      "expected": {
+        "tissue_harmonized": "prostate gland",
+        "disease_harmonized": "prostate cancer",
+        "gender_harmonized": "male",
+        "age_harmonized": "72"
+      }
+    }
+  ]
+}

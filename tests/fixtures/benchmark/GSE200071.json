@@ -1,0 +1,27 @@
+{
+  "gse_id": "GSE200071",
+  "input": {
+    "title": "Corneal dystrophy RNA-seq",
+    "summary": "RNA-seq of corneal tissue",
+    "tissue": "cornea"
+  },
+  "expected": {
+    "tissue_harmonized": "cornea",
+    "tissue_ontology_id": "UBERON:0000964"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000071",
+      "input": {
+        "tissue": "cornea",
+        "gender": "M",
+        "age": "65 years"
+      },
+      "expected": {
+        "tissue_harmonized": "cornea",
+        "gender_harmonized": "male",
+        "age_harmonized": "65"
+      }
+    }
+  ]
+}

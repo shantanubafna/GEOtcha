@@ -1,0 +1,28 @@
+{
+  "gse_id": "GSE200061",
+  "input": {
+    "title": "Heart failure RNA-seq",
+    "summary": "RNA-seq of cardiac tissue",
+    "tissue": "heart",
+    "disease": "heart failure"
+  },
+  "expected": {
+    "tissue_harmonized": "heart",
+    "tissue_ontology_id": "UBERON:0000948",
+    "disease_harmonized": "congestive heart failure",
+    "disease_ontology_id": "DOID:6000"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000061",
+      "input": {
+        "tissue": "heart",
+        "disease": "heart failure"
+      },
+      "expected": {
+        "tissue_harmonized": "heart",
+        "disease_harmonized": "congestive heart failure"
+      }
+    }
+  ]
+}

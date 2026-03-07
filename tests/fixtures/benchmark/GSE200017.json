@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200017",
+  "input": {
+    "title": "Thyroid cancer transcriptome",
+    "summary": "RNA-seq of papillary thyroid carcinoma",
+    "tissue": "thyroid gland",
+    "disease": "thyroid cancer"
+  },
+  "expected": {
+    "tissue_harmonized": "thyroid gland",
+    "tissue_ontology_id": "UBERON:0002046",
+    "disease_harmonized": "thyroid cancer",
+    "disease_ontology_id": "DOID:1781"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000017",
+      "input": {
+        "tissue": "thyroid gland",
+        "disease": "thyroid cancer",
+        "gender": "F",
+        "age": "42 years"
+      },
+      "expected": {
+        "tissue_harmonized": "thyroid gland",
+        "disease_harmonized": "thyroid cancer",
+        "gender_harmonized": "female",
+        "age_harmonized": "42"
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE200006",
+  "input": {
+    "title": "Acute myeloid leukemia blast transcriptome",
+    "summary": "RNA-seq of bone marrow from AML patients",
+    "tissue": "bone marrow",
+    "disease": "acute myeloid leukemia",
+    "treatment": "doxorubicin"
+  },
+  "expected": {
+    "tissue_harmonized": "bone marrow",
+    "tissue_ontology_id": "UBERON:0002371",
+    "disease_harmonized": "acute myeloid leukemia",
+    "disease_ontology_id": "DOID:9119",
+    "treatment_harmonized": "doxorubicin"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000006",
+      "input": {
+        "tissue": "bone marrow",
+        "disease": "acute myeloid leukemia",
+        "gender": "F",
+        "age": "45 years",
+        "treatment": "doxorubicin",
+        "cell_type": "monocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "bone marrow",
+        "disease_harmonized": "acute myeloid leukemia",
+        "gender_harmonized": "female",
+        "age_harmonized": "45",
+        "treatment_harmonized": "doxorubicin",
+        "cell_type_harmonized": "monocyte"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200014",
+  "input": {
+    "title": "Gastric cancer RNA-seq",
+    "summary": "Transcriptome of stomach adenocarcinoma",
+    "tissue": "stomach",
+    "disease": "gastric cancer"
+  },
+  "expected": {
+    "tissue_harmonized": "stomach",
+    "tissue_ontology_id": "UBERON:0000945",
+    "disease_harmonized": "stomach cancer",
+    "disease_ontology_id": "DOID:10534"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000014",
+      "input": {
+        "tissue": "stomach",
+        "disease": "gastric cancer",
+        "gender": "M",
+        "age": "59 years"
+      },
+      "expected": {
+        "tissue_harmonized": "stomach",
+        "disease_harmonized": "stomach cancer",
+        "gender_harmonized": "male",
+        "age_harmonized": "59"
+      }
+    }
+  ]
+}

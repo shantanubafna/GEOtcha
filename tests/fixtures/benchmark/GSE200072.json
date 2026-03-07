@@ -1,0 +1,29 @@
+{
+  "gse_id": "GSE200072",
+  "input": {
+    "title": "Tonsil immune cell transcriptome",
+    "summary": "RNA-seq of tonsil tissue",
+    "tissue": "tonsil"
+  },
+  "expected": {
+    "tissue_harmonized": "tonsil",
+    "tissue_ontology_id": "UBERON:0002372"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000072",
+      "input": {
+        "tissue": "tonsil",
+        "cell_type": "B cell",
+        "gender": "M",
+        "age": "8 years"
+      },
+      "expected": {
+        "tissue_harmonized": "tonsil",
+        "cell_type_harmonized": "B cell",
+        "gender_harmonized": "male",
+        "age_harmonized": "8"
+      }
+    }
+  ]
+}

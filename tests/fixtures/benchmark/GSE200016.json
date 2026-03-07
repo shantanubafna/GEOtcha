@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200016",
+  "input": {
+    "title": "Kidney cancer RNA-seq analysis",
+    "summary": "RNA-seq of clear cell renal cell carcinoma",
+    "tissue": "kidney",
+    "disease": "renal cell carcinoma"
+  },
+  "expected": {
+    "tissue_harmonized": "kidney",
+    "tissue_ontology_id": "UBERON:0002113",
+    "disease_harmonized": "renal cell carcinoma",
+    "disease_ontology_id": "DOID:4450"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000016",
+      "input": {
+        "tissue": "kidney",
+        "disease": "renal cell carcinoma",
+        "gender": "M",
+        "age": "57 years"
+      },
+      "expected": {
+        "tissue_harmonized": "kidney",
+        "disease_harmonized": "renal cell carcinoma",
+        "gender_harmonized": "male",
+        "age_harmonized": "57"
+      }
+    }
+  ]
+}

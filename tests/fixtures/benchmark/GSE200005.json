@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200005",
+  "input": {
+    "title": "Glioblastoma RNA expression profiling",
+    "summary": "RNA-seq of glioblastoma multiforme tumors",
+    "tissue": "brain",
+    "disease": "glioblastoma"
+  },
+  "expected": {
+    "tissue_harmonized": "brain",
+    "tissue_ontology_id": "UBERON:0000955",
+    "disease_harmonized": "glioblastoma",
+    "disease_ontology_id": "DOID:3068"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000005",
+      "input": {
+        "tissue": "brain",
+        "disease": "glioblastoma",
+        "gender": "M",
+        "age": "71 years",
+        "cell_type": "astrocyte"
+      },
+      "expected": {
+        "tissue_harmonized": "brain",
+        "disease_harmonized": "glioblastoma",
+        "gender_harmonized": "male",
+        "age_harmonized": "71",
+        "cell_type_harmonized": "astrocyte"
+      }
+    }
+  ]
+}

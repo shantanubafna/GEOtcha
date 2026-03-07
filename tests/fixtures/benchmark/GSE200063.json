@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200063",
+  "input": {
+    "title": "IBD combination therapy study",
+    "summary": "RNA-seq of colon biopsies from patients on azathioprine",
+    "tissue": "colon",
+    "disease": "ulcerative colitis",
+    "treatment": "azathioprine"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "ulcerative colitis",
+    "disease_ontology_id": "DOID:8577",
+    "treatment_harmonized": "azathioprine"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000063",
+      "input": {
+        "tissue": "colon",
+        "disease": "ulcerative colitis",
+        "treatment": "azathioprine",
+        "gender": "M",
+        "age": "37 years"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "ulcerative colitis",
+        "treatment_harmonized": "azathioprine",
+        "gender_harmonized": "male",
+        "age_harmonized": "37"
+      }
+    }
+  ]
+}

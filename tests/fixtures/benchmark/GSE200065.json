@@ -1,0 +1,47 @@
+{
+  "gse_id": "GSE200065",
+  "input": {
+    "title": "Multi-tissue IBD transcriptome",
+    "summary": "RNA-seq of colon and ileum from IBD patients",
+    "tissue": "colon",
+    "disease": "inflammatory bowel disease"
+  },
+  "expected": {
+    "tissue_harmonized": "colon",
+    "tissue_ontology_id": "UBERON:0001155",
+    "disease_harmonized": "inflammatory bowel disease",
+    "disease_ontology_id": "DOID:0050589"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000065a",
+      "input": {
+        "tissue": "colon",
+        "disease": "ulcerative colitis",
+        "gender": "M",
+        "age": "45 years"
+      },
+      "expected": {
+        "tissue_harmonized": "colon",
+        "disease_harmonized": "ulcerative colitis",
+        "gender_harmonized": "male",
+        "age_harmonized": "45"
+      }
+    },
+    {
+      "gsm_id": "GSM6000065b",
+      "input": {
+        "tissue": "ileum",
+        "disease": "crohn's disease",
+        "gender": "F",
+        "age": "33 years"
+      },
+      "expected": {
+        "tissue_harmonized": "ileum",
+        "disease_harmonized": "Crohn's disease",
+        "gender_harmonized": "female",
+        "age_harmonized": "33"
+      }
+    }
+  ]
+}

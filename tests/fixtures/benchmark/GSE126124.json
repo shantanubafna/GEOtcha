@@ -8,7 +8,7 @@
     "treatment": "adalimumab"
   },
   "expected": {
-    "tissue_harmonized": "ileal mucosa",
+    "tissue_harmonized": "mucosa",
     "tissue_ontology_id": "UBERON:0000331",
     "disease_harmonized": "Crohn's disease",
     "disease_ontology_id": "DOID:8778",

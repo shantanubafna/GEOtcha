@@ -1,0 +1,34 @@
+{
+  "gse_id": "GSE200050",
+  "input": {
+    "title": "Cystic fibrosis airway RNA-seq",
+    "summary": "RNA-seq of airway epithelial cells from CF patients",
+    "tissue": "lung",
+    "disease": "cystic fibrosis"
+  },
+  "expected": {
+    "tissue_harmonized": "lung",
+    "tissue_ontology_id": "UBERON:0002048",
+    "disease_harmonized": "cystic fibrosis",
+    "disease_ontology_id": "DOID:1485"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000050",
+      "input": {
+        "tissue": "lung",
+        "disease": "cystic fibrosis",
+        "gender": "F",
+        "age": "18 years",
+        "cell_type": "epithelial cell"
+      },
+      "expected": {
+        "tissue_harmonized": "lung",
+        "disease_harmonized": "cystic fibrosis",
+        "gender_harmonized": "female",
+        "age_harmonized": "18",
+        "cell_type_harmonized": "epithelial cell"
+      }
+    }
+  ]
+}

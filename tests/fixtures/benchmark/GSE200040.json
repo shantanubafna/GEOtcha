@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200040",
+  "input": {
+    "title": "Migraine blood transcriptomics",
+    "summary": "RNA-seq of blood from migraine patients",
+    "tissue": "peripheral blood",
+    "disease": "migraine"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "migraine",
+    "disease_ontology_id": "DOID:6364"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000040",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "migraine",
+        "gender": "F",
+        "age": "32 years"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "migraine",
+        "gender_harmonized": "female",
+        "age_harmonized": "32"
+      }
+    }
+  ]
+}

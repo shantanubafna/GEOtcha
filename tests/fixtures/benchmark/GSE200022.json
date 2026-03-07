@@ -1,0 +1,38 @@
+{
+  "gse_id": "GSE200022",
+  "input": {
+    "title": "Systemic lupus erythematosus blood transcriptome",
+    "summary": "RNA-seq of SLE patient peripheral blood",
+    "tissue": "peripheral blood",
+    "disease": "systemic lupus erythematosus",
+    "treatment": "hydroxychloroquine"
+  },
+  "expected": {
+    "tissue_harmonized": "peripheral blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "systemic lupus erythematosus",
+    "disease_ontology_id": "DOID:9074",
+    "treatment_harmonized": "hydroxychloroquine"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000022",
+      "input": {
+        "tissue": "peripheral blood",
+        "disease": "SLE",
+        "gender": "F",
+        "age": "35 years",
+        "treatment": "hydroxychloroquine",
+        "cell_type": "T cell"
+      },
+      "expected": {
+        "tissue_harmonized": "peripheral blood",
+        "disease_harmonized": "systemic lupus erythematosus",
+        "gender_harmonized": "female",
+        "age_harmonized": "35",
+        "treatment_harmonized": "hydroxychloroquine",
+        "cell_type_harmonized": "T cell"
+      }
+    }
+  ]
+}

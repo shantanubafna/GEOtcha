@@ -8,7 +8,7 @@
     "treatment": "methotrexate"
   },
   "expected": {
-    "tissue_harmonized": "synovial membrane",
+    "tissue_harmonized": "synovial membrane of synovial joint",
     "tissue_ontology_id": "UBERON:0000042",
     "disease_harmonized": "rheumatoid arthritis",
     "disease_ontology_id": "DOID:7148",
@@ -26,7 +26,7 @@
         "cell_type": "fibroblast"
       },
       "expected": {
-        "tissue_harmonized": "synovial membrane",
+        "tissue_harmonized": "synovial membrane of synovial joint",
         "disease_harmonized": "rheumatoid arthritis",
         "gender_harmonized": "female",
         "age_harmonized": "55",

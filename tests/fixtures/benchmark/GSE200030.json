@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200030",
+  "input": {
+    "title": "Psoriatic arthritis synovial RNA-seq",
+    "summary": "RNA-seq of PsA synovial fluid",
+    "tissue": "synovial membrane",
+    "disease": "psoriatic arthritis",
+    "treatment": "adalimumab"
+  },
+  "expected": {
+    "tissue_harmonized": "synovial membrane of synovial joint",
+    "tissue_ontology_id": "UBERON:0002018",
+    "disease_harmonized": "psoriatic arthritis",
+    "disease_ontology_id": "DOID:9008",
+    "treatment_harmonized": "adalimumab"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000030",
+      "input": {
+        "tissue": "synovial membrane",
+        "disease": "psoriatic arthritis",
+        "gender": "M",
+        "age": "45 years",
+        "treatment": "adalimumab"
+      },
+      "expected": {
+        "tissue_harmonized": "synovial membrane of synovial joint",
+        "disease_harmonized": "psoriatic arthritis",
+        "gender_harmonized": "male",
+        "age_harmonized": "45",
+        "treatment_harmonized": "adalimumab"
+      }
+    }
+  ]
+}

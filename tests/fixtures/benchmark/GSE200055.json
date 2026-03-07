@@ -1,0 +1,32 @@
+{
+  "gse_id": "GSE200055",
+  "input": {
+    "title": "Malaria blood transcriptome",
+    "summary": "RNA-seq of blood from malaria-infected patients",
+    "tissue": "whole blood",
+    "disease": "malaria"
+  },
+  "expected": {
+    "tissue_harmonized": "blood",
+    "tissue_ontology_id": "UBERON:0000178",
+    "disease_harmonized": "malaria",
+    "disease_ontology_id": "DOID:12365"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000055",
+      "input": {
+        "tissue": "whole blood",
+        "disease": "malaria",
+        "gender": "M",
+        "age": "25 years"
+      },
+      "expected": {
+        "tissue_harmonized": "blood",
+        "disease_harmonized": "malaria",
+        "gender_harmonized": "male",
+        "age_harmonized": "25"
+      }
+    }
+  ]
+}

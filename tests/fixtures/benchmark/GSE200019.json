@@ -1,0 +1,36 @@
+{
+  "gse_id": "GSE200019",
+  "input": {
+    "title": "CML imatinib response transcriptomics",
+    "summary": "RNA-seq of chronic myeloid leukemia samples",
+    "tissue": "bone marrow",
+    "disease": "chronic myeloid leukemia",
+    "treatment": "imatinib"
+  },
+  "expected": {
+    "tissue_harmonized": "bone marrow",
+    "tissue_ontology_id": "UBERON:0002371",
+    "disease_harmonized": "chronic myeloid leukemia",
+    "disease_ontology_id": "DOID:8552",
+    "treatment_harmonized": "imatinib"
+  },
+  "samples": [
+    {
+      "gsm_id": "GSM6000019",
+      "input": {
+        "tissue": "bone marrow",
+        "disease": "chronic myeloid leukemia",
+        "gender": "M",
+        "age": "50 years",
+        "treatment": "imatinib"
+      },
+      "expected": {
+        "tissue_harmonized": "bone marrow",
+        "disease_harmonized": "chronic myeloid leukemia",
+        "gender_harmonized": "male",
+        "age_harmonized": "50",
+        "treatment_harmonized": "imatinib"
+      }
+    }
+  ]
+}
